@@ -26,8 +26,8 @@ class KNN:
         knn_indexes = [np.argsort(distances[i,:])[:self.k] for i in range(N)]
         labels_of_neighbours = [self.Y[indexes].astype(np.int) for indexes in KNN_indexes]
         N_c = len(self.Y.unique())
-        policy = self.vote(labels_of_neighbours, N_c, distances)
-
+        y_pred = self.vote(labels_of_neighbours, N_c, distances)
+        return y_pred
 
     def fit_predict(self, X, Y):
         return self.fit(X, Y).predict(X)
