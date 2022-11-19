@@ -1,4 +1,6 @@
 import numpy as np
+from sklearn.feature_selection import mutual_info_classif
+import sklearn_relief as relief
 
 class KNN:
     def __init__(self, n_neighbors=5,
@@ -35,10 +37,17 @@ class KNN:
     def compute_weights(self):
         # TO DO haciendo uso del self.X y del self.Y
         # weights va a ser un vector de dimensiones self.X.shape[1] --> numero de columnas (o variables)
-        if self.weights == 'uniform':
-            #self.W = vector
-        # elif self.weights == 'otra':
-        # no hace falta hacer ningun return
+
+        if self.weights == 'equal':
+            self.W = np.ones((1, self.X.shape[1]))
+
+        elif self.weights == 'info_gain':
+            self.W = mutual_info_classif(self.X, self.Y)
+
+        elif self.weights == 'relief':
+            r = relief()
+            r.fit_transform(self.X, self.Y)
+            self.W = r.w_
 
     def computeDistanceMatrix(self, X_new, X, W):
         # TO DO
