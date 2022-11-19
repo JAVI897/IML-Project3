@@ -49,34 +49,34 @@ class KNN:
                 idx = i
         return idx
 
-    def relief(self, X, y):
+    def relief(self):
 
-        feature_scores = np.zeros(X.shape[1])
+        feature_scores = np.zeros(self.X.shape[1])
 
-        labels, counts = np.unique(y, return_counts=True)
-        Prob = counts / float(len(y))
+        labels, counts = np.unique(self.Y, return_counts=True)
+        Prob = counts / float(len(self.Y))
         for label in labels:
             # Find the nearest hit for each sample in the subset with the corresponding label
-            select = (y == label)
-            tree = KDTree(X[select, :])
-            nh = tree.query(X[select, :], k=2, return_distance=False)[:, 1:]
+            select = (self.Y == label)
+            tree = KDTree(self.X[select, :])
+            nh = tree.query(self.X[select, :], k=2, return_distance=False)[:, 1:]
             nh = (nh.T[0]).tolist()
 
             # Calculate the difference of x with nh
             nh_mat = np.square(np.subtract(
-                X[select, :], X[select, :][nh, :])) * -1
+                self.X[select, :], self.X[select, :][nh, :])) * -1
 
             # Find the nearest miss for each sample in the other subset
-            nm_mat = np.zeros_like(X[select, :])
+            nm_mat = np.zeros_like(self.X[select, :])
             for prob, other_label in zip(Prob[labels != label], labels[labels != label]):
-                other_select = (y == other_label)
+                other_select = (self.Y == other_label)
                 nm = []
-                for sample in X[select, :]:
-                    nm.append(find_nm(sample, X[other_select, :]))
+                for sample in self.X[select, :]:
+                    nm.append(find_nm(sample, self.X[other_select, :]))
                     
                 # # Calculate the difference of x with nm
                 nm_tmp = np.square(np.subtract(
-                    X[select, :], X[other_select, :][nm, :])) * prob
+                    self.X[select, :], self.X[other_select, :][nm, :])) * prob
                 nm_mat = np.add(nm_mat, nm_tmp)
 
             mat = np.add(nh_mat, nm_mat)
