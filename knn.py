@@ -120,6 +120,29 @@ class KNN:
         # return distances
         return
 
+    def computeDistancesMatrix(metric, X_new, X, W, p):
+        if (metric == 'euclidean' or metric == 'minkowski') and p <= 0:
+            raise ValueError("p must be greater than 0")
+
+        if validate_dimensions(X_new, X) == 0:
+            if validate_dimensions(X_new, W) == 0:
+
+                if metric == 'euclidean':
+                    dist_matrix = euclidean_matrix(X_new, X, W, p)
+
+                elif metric == 'minkowski':
+                    dist_matrix = minkowski_matrix(X_new, X, W, p)
+
+                elif metric == 'cosine':
+                    dist_matrix = cosine_matrix(X_new, X)
+
+                elif metric == 'w_cosine':
+                    dist_matrix = weighted_cosine_matrix(X_new, X, W)
+
+                D = dist_matrix
+
+                return D
+
     def vote(labels, number_classes, Y, voting, distances=None):
         voting_list = []
         for i_x, nearest_labels in enumerate(labels):
