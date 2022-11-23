@@ -153,10 +153,10 @@ class KNN:
                     voting_value_class = sum(1 for i in nearest_labels if i == class_y)
 
                 elif voting == 'inverse_distance':
-                    voting_value_class = sum(1 / abs(distances(i_x, i)) for i in nearest_labels if i == class_y)
+                    voting_value_class = sum(1 / abs(distances(i,i_x)) for i in nearest_labels if i == class_y)
 
                 elif voting == 'shepards':
-                    voting_value_class = sum(exp(- abs(distances(i_x, i))) for i in nearest_labels if i == class_y)
+                    voting_value_class = sum(exp(- abs(distances(i,i_x))) for i in nearest_labels if i == class_y)
                 voting_class_list.append(voting_value_class)
 
             winners = np.argwhere(voting_class_list == np.max(voting_class_list)).flatten()
