@@ -4,7 +4,7 @@ import sklearn_relief as relief
 from scipy.spatial.distance import euclidean
 from sklearn.neighbors import KDTree
 from sklearn.preprocessing import normalize
-
+from distances import validate_dimensions, euclidean_matrix, minkowski_matrix, cosine_matrix, weighted_cosine_matrix
 
 class KNN:
     def __init__(self, n_neighbors=5,
@@ -97,7 +97,7 @@ class KNN:
         elif self.weights == 'relief':
             self.W = relief(self.X, self.Y)
 
-    def computeDistanceMatrix(self, X_new, X, W):
+    #def computeDistanceMatrix(self, X_new, X, W):
         # TO DO
         # las funciones de distancia q implementemos se pueden poner en otro archivo py
         # e importarlas desde aquí o implementarlas aqui
@@ -118,7 +118,7 @@ class KNN:
         # if self.metric == 'cosine':
         # distances = cosine_dist(X_new, X, w=W)
         # return distances
-        return
+    #    return
 
     def computeDistancesMatrix(metric, X_new, X, W, p):
         if (metric == 'euclidean' or metric == 'minkowski') and p <= 0:
@@ -142,6 +142,7 @@ class KNN:
                 D = dist_matrix
 
                 return D
+
 
     def vote(labels, number_classes, Y, voting, distances=None):
         voting_list = []
