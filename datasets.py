@@ -111,3 +111,29 @@ def preprocess_hypothyroid(file_name_train, file_name_test):
     X_train = X_train.drop(['Class', 'split'], axis = 1)
     X_test = X_test.drop(['Class', 'split'], axis = 1)
     return X_train, X_test, Y_train, Y_test
+
+def preprocess_pen_based(file_name_train, file_name_test):
+
+    data = arff.loadarff(file_name_train)
+    data_test = arff.loadarff(file_name_test)
+    df = pd.DataFrame(data[0])
+    df_test = pd.DataFrame(data_test[0])
+    df['split'] = 'Train'
+    df_test['split'] = 'Test'
+    df = pd.concat([df, df_test], ignore_index=True)
+
+    df = df.applymap(lambda x: x.decode() if hasattr(x, 'decode') else x)
+
+    numeric_vbles = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9',
+                     'a10', 'a11', 'a12', 'a13', 'a14', 'a15', 'a16']
+    for c in numeric_vbles:
+        df[c] = StandardScaler().fit_transform(df[c].values.reshape(-1, 1))
+
+    X_train = df.loc[df['split'] == 'Train']
+    X_test = df.loc[df['split'] == 'Test']
+    Y_train = X_train['a17']
+    Y_test = X_test['a17']
+    X_train = X_train.drop(['a17', 'split'], axis = 1)
+    X_test = X_test.drop(['a17', 'split'], axis = 1)
+
+    return X_train, X_test, Y_train, Y_test
