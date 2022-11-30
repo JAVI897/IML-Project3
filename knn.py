@@ -15,13 +15,15 @@ class KNN:
                  p=1,
                  distances_precomputed = None,
                  weights_precomputed = None,
-                 metric_scipy = True
+                 metric_gpu = True
                  ):
 
         self.k = n_neighbors
         if voting not in ['majority', 'inverse_distance', 'shepards']:
-            raise ValueError("voting is expected to be named as; 'majority', 'inverse_distance' or 'shepards', got {} instead".format(metric))
+            raise ValueError("voting is expected to be named as; 'majority', 'inverse_distance' or 'shepards', got {} instead".format(voting))
         self.voting = voting
+        if weights not in ['uniform', 'info_gain', 'relief']:
+            raise ValueError("weight is expected to be named as; 'uniform', 'info_gain' or 'relief', got {} instead".format(weights))
         self.weights = weights
         if metric not in ['minkowski', 'euclidean', 'cosine']:
             raise ValueError("metric is expected to be named as; 'minkowski', 'euclidean' or 'cosine', got {} instead".format(metric))
@@ -30,8 +32,8 @@ class KNN:
         self.metric = metric
         self.p = p
         self.distances = distances_precomputed
-        self.metric_scipy = metric_scipy
         self.W = weights_precomputed
+        self.metric_gpu = metric_gpu
 
     def fit(self, X, Y):
         self.X = X
@@ -66,25 +68,22 @@ class KNN:
     def computeDistanceMatrix(self, X_new):
 
         if self.metric == 'euclidean':
-            if self.metric_scipy:
-                dist_matrix = cdist(X_new, self.X, metric=self.metric, p=2, w=self.W)
+            if self.metric_gpu:
+                dist_matrix = euclidean_matrix(X_new, self.X, self.W)
             else:
-                #dist_matrix = euclidean_matrix(X_new, X, W, p)
-                pass
+                dist_matrix = cdist(X_new, self.X, metric='minkowski', p=2, w=self.W)
 
         elif self.metric == 'minkowski':
-            if self.metric_scipy:
-                dist_matrix = cdist(X_new, self.X, metric=self.metric, p=self.p, w=self.W)
+            if self.metric_gpu:
+                dist_matrix = minkowski_matrix(X_new, self.X, self.W, self.p)
             else:
-                #dist_matrix = minkowski_matrix(X_new, X, W, p)
-                pass
+                dist_matrix = cdist(X_new, self.X, metric='minkowski', p=self.p, w=self.W)
 
         elif self.metric == 'cosine':
-            if self.metric_scipy:
-                dist_matrix = cdist(X_new, self.X, metric=self.metric, w=self.W)
+            if self.metric_gpu:
+                dist_matrix = cosine_matrix(X_new, self.X, self.W)
             else:
-                # dist_matrix = minkowski_matrix(X_new, X, W, p)
-                pass
+                dist_matrix = cdist(X_new, self.X, metric='cosine', w=self.W)
 
         return dist_matrix
 

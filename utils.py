@@ -1,136 +1,59 @@
-import numpy as np
-from scipy.spatial.distance import euclidean
+import torch
+import os
+import pandas as pd
 
-def find_nm(sample, X):
-    dist = 100000
-    idx = None
-    for i, s in enumerate(X):
-        tmp = euclidean(sample, s)
-        if tmp <= dist:
-            dist = tmp
-            idx = i
-    return idx
+def save_results(config, knn_config, kfold_results):
+    path = './results/results_{}.csv'.format(config['dataset'])
+    cols = ['acc_fold_{}'.format(i) for i in range(10)] + ['time_fold_{}'.format(i) for i in range(10)] + ['mean_acc','sd_mean_acc','mean_exec_time','sd_exec_time']
 
-def relief(X, Y):
-    feature_scores = np.zeros(X.shape[1])
-    labels, counts = np.unique(Y, return_counts=True)
+    df_aux = pd.DataFrame(kfold_results, columns=cols)
+    df_aux['n_neighbors'] = knn_config['n_neighbors']
+    df_aux['weights'] = knn_config['weights']
+    df_aux['metric'] = '{}'.format(knn_config['metric']) if knn_config['metric'] != 'minkowski' else '{}_p_{}'.format(knn_config['metric'], knn_config['p'])
+    df_aux['voting'] = knn_config['voting']
 
-    prob = counts / float(len(Y))
-    for label in labels:
-        # Find the nearest hit for each sample in the subset with the corresponding label
-        select = (Y == label)
-        tree = KDTree(X[select, :])
-        nh = tree.query(X[select, :], k=2, return_distance=False)[:, 1:]
-        nh = (nh.T[0]).tolist()
-
-        # Calculate the difference of x with nh
-        nh_mat = np.square(np.subtract(
-            X[select, :], X[select, :][nh, :])) * -1
-
-        # Find the nearest miss for each sample in the other subset
-        nm_mat = np.zeros_like(X[select, :])
-        for prob, other_label in zip(prob[labels != label], labels[labels != label]):
-            other_select = (Y == other_label)
-            nm = []
-            for sample in X[select, :]:
-                nm.append(find_nm(sample, X[other_select, :]))
-            # Calculate the difference of x with nm
-            nm_tmp = np.square(np.subtract(
-                X[select, :], X[other_select, :][nm, :])) * prob
-            nm_mat = np.add(nm_mat, nm_tmp)
-        mat = np.add(nh_mat, nm_mat)
-        feature_scores += np.sum(mat, axis=0)
-    return normalize([feature_scores])
-
-# Validate dimensions of matrices
-def validate_dimensions(u, v):
-    row_u = len(u)
-    clm_u = len(u[0])
-
-    row_v = len(v)
-    clm_v = len(v[0])
-
-    if row_u == row_v and clm_u == clm_v:
-        return 0
+    if os.path.isfile(path):
+        df = pd.read_csv(path)
+        df_both = pd.concat([df, df_aux], ignore_index=True, sort=False)
+        df_both = df_both.drop_duplicates(subset = ['n_neighbors', 'weights', 'metric', 'voting' ])
+        df_both.to_csv(path, index=False)
     else:
-        return 1
+        df_aux.to_csv(path, index=False)
 
+def euclidean_matrix(X_new, X, W):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print('[INFO] Computations using: {}'.format('GPU' if torch.cuda.is_available() else 'cpu'))
+    X_new = torch.from_numpy(X_new).to(device)
+    X = torch.from_numpy(X).to(device)
+    W = torch.from_numpy(W).to(device)
 
-def validate_weights(u, w):
-    clm_u = len(u[0])
-    clm_w = len(w[0])
+    d = X_new.unsqueeze(1) - X.unsqueeze(0)
+    d = torch.sqrt(torch.sum( W * (d * d), -1))
+    print('[INFO] Distance computed!')
+    return d.numpy()
 
-    if clm_u == clm_w:
-        return 0
-    else:
-        return 1
+def minkowski_matrix(X_new, X, W, p):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print('[INFO] Computations using: {}'.format('GPU' if torch.cuda.is_available() else 'cpu'))
+    X_new = torch.from_numpy(X_new).to(device)
+    X = torch.from_numpy(X).to(device)
+    W = torch.from_numpy(W).to(device)
 
+    d = X_new.unsqueeze(1) - X.unsqueeze(0)
+    d = torch.sum( W * (torch.abs(d)**p), -1)**(1/p)
+    print('[INFO] Distance computed!')
+    return d.numpy()
 
-############ DISTANCES #############
+def cosine_matrix(X_new, X, W):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print('[INFO] Computations using: {}'.format('GPU' if torch.cuda.is_available() else 'cpu'))
+    X_new = torch.from_numpy(X_new).to(device)
+    X = torch.from_numpy(X).to(device)
+    W = torch.from_numpy(W).to(device)
 
-# Functions for minkowski
-def minkowski(u, v, w, p):
-    u_v = np.abs(u - v)
-    m = 0
-    for i in range(u.shape[0]):
-        m = m + (u_v[i] ** p) * w[i]
-    m = m ** (1 / p)
-    return m
-
-def minkowski_matrix(u, v, w, p):
-    if p <= 0:
-        raise ValueError("p must be greater than 0")
-    N = u.shape[0]
-    N_prima = v.shape[0]
-    D = np.zeros((N, N_prima))
-    for i in range(N):
-        for j in range(N_prima):
-            D[i][j] = minkowski(u[i], v[j], w, p)
-    return D
-
-# Function for euclidean
-def euclidean_matrix(u, v, w, p):
-    euclidean_dist = minkowski_matrix(u, v, w, p=2)
-    return euclidean_dist
-
-# Functions for cosine
-def cosine(u, v, w=None):
-    norm_u = np.linalg.norm(u)
-    norm_v = np.linalg.norm(v)
-
-    if norm_u == 0 or norm_v == 0:
-        raise ValueError("At least one of the observations is a zero vector")
-
-    uv = np.dot(u, v)
-    cos = uv / (norm_u * norm_v)
-    return cos
-
-def cosine_matrix(u, v):
-    if validate_dimensions(u, v) == 0:
-        D = np.zeros((len(u[0]), len(v)))
-        for j in range(len(u[0])):
-            for i in range(len(u)):
-                D[i][j] = cosine(u[i], v[j])
-        return D
-
-# Weighted cosine
-def weighted_cosine(u, v, w):
-    norm_u = np.linalg.norm(u)
-    norm_v = np.linalg.norm(v)
-
-    if norm_u == 0 or norm_v == 0:
-        raise ValueError("At least one of the observations is a zero vector")
-
-    w_cos = 0
-    for i in range(len(u)):
-        w_cos = w_cos + ((w[i] * u[i] * v[i]) / (norm_u * norm_v))
-    return w_cos
-
-def weighted_cosine_matrix(u, v, w):
-    if validate_dimensions(u, v) == 0:
-        if validate_weights(u, w) == 0:
-            D = np.zeros((len(u[0]), len(v)))
-            for j in range(len(u[0])):
-                for i in range(len(u)):
-                    D[i][j] = weighted_cosine(u[i], v[j], w[i])
-        return D
+    sqrt_W = torch.sqrt(W)
+    X_new = X_new * sqrt_W
+    X = X * sqrt_W
+    d = torch.matmul( X_new, torch.transpose(X, 0, 1) ) / torch.linalg.norm(X, dim = 1) / torch.linalg.norm(X_new, dim = 1, keepdim = True)
+    print('[INFO] Distance computed!')
+    return 1 - d.numpy()
