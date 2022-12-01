@@ -22,6 +22,7 @@ def save_results(config, knn_config, kfold_results):
         df_aux.to_csv(path, index=False)
 
 def euclidean_matrix(X_new, X, W):
+    torch.cuda.empty_cache()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('[INFO] Computations using: {}'.format('GPU' if torch.cuda.is_available() else 'cpu'))
     X_new = torch.from_numpy(X_new).to(device)
@@ -34,6 +35,7 @@ def euclidean_matrix(X_new, X, W):
     return d.cpu().detach().numpy()
 
 def minkowski_matrix(X_new, X, W, p):
+    torch.cuda.empty_cache()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('[INFO] Computations using: {}'.format('GPU' if torch.cuda.is_available() else 'cpu'))
     X_new = torch.from_numpy(X_new).to(device)
@@ -46,6 +48,7 @@ def minkowski_matrix(X_new, X, W, p):
     return d.cpu().detach().numpy()
 
 def cosine_matrix(X_new, X, W):
+    torch.cuda.empty_cache()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('[INFO] Computations using: {}'.format('GPU' if torch.cuda.is_available() else 'cpu'))
     X_new = torch.from_numpy(X_new).to(device)
