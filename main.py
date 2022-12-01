@@ -46,10 +46,10 @@ def kfold(config, knn_config: dict, use_precomputed = False):
                     print('[INFO] Found precomputed distance: {}'.format(distance_name_file))
 
         precomputed_weights = None
+        weight_name_file = 'weight_{}.npy'.format(knn_config['weights'])
+        path_weight = './precomputed/{}/'.format(dataset_name) + weight_name_file
 
         if use_precomputed:
-            weight_name_file = 'weight_{}.npy'.format(knn_config['weights'])
-            path_weight = './precomputed/{}/'.format(dataset_name) + weight_name_file
             if os.path.isfile(path_weight):
                 with open(path_weight, 'rb') as f:
                     precomputed_weights = np.load(f)
