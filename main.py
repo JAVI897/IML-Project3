@@ -1,40 +1,86 @@
 import argparse
 from kfold import kfold
+import pandas as pd
+import os
+from visualize import visualize_results, visualize_t_student_matrix
 
 parser = argparse.ArgumentParser()
 
 ### run--> python main.py --dataset vote
 parser.add_argument("--dataset", type=str, default='adult', choices=['adult', 'hyp', 'pen-based'])
+parser.add_argument("--run_experiments", type=str, default='yes', choices=['yes', 'no'])
+parser.add_argument("--visualize_results", type=str, default='yes', choices=['yes', 'no'])
 parser.add_argument("--gpu", type=str, default='yes', choices=['yes', 'no'])
 con = parser.parse_args()
 
 def configuration():
     config = {
                 'dataset':con.dataset,
-                'gpu':con.gpu
+                'gpu':con.gpu,
+                'run_experiments': True if con.run_experiments == 'yes' else False,
+                'visualize_results': True if con.visualize_results == 'yes' else False
              }
     return config
 
 def main():
     config = configuration()
-    #### GRIDSEARCH
-    for weight in ['uniform']: ## ['uniform', 'info_gain', 'relief']
-        for metric in ['euclidean', 'cosine']: ## ['minkowski', 'euclidean', 'cosine']
-            for vot in ['majority', 'inverse_distance', 'shepards']: ## ['majority', 'inverse_distance', 'shepards']
-                for k in range(1, 30, 5):
-                    knn_config = {'n_neighbors': k,
-                                  'weights': weight,
-                                  'metric': metric,
-                                  'voting': vot,
-                                  'p': 2,
-                                  }
-                    print('[INFO] Running. n_neighbors:{} weights:{} metric:{} voting:{}'.format(k, weight, metric, vot))
-                    if metric == 'minkowski':
-                        for p in [1, 3, 4]:
-                            knn_config['p'] = p
+
+    if config['run_experiments']:
+        #### GRIDSEARCH
+        for weight in ['uniform', 'info_gain', 'relief']: ## ['uniform', 'info_gain', 'relief']
+            for metric in ['minkowski']: ## ['minkowski', 'euclidean', 'cosine']
+                for vot in ['majority', 'inverse_distance', 'shepards']: ## ['majority', 'inverse_distance', 'shepards']
+                    for k in range(1, 30, 5):
+                        knn_config = {'n_neighbors': k,
+                                      'weights': weight,
+                                      'metric': metric,
+                                      'voting': vot,
+                                      'p': 2,
+                                      }
+                        print('[INFO] Running. n_neighbors:{} weights:{} metric:{} voting:{}'.format(k, weight, metric, vot))
+                        if metric == 'minkowski':
+                            for p in [1, 3, 4]:
+                                knn_config['p'] = p
+                                kfold(config, knn_config)
+                        else:
                             kfold(config, knn_config)
-                    else:
-                        kfold(config, knn_config)
+
+    if config['visualize_results']:
+        if config['dataset'] == 'hyp':
+            # read results
+            path_results = './results/results_hyp.csv'
+            r = pd.read_csv(path_results)
+            if os.path.isfile(path_results):
+                savefig_path = './results/{}/'.format(config['dataset'])
+                visualize_results(r, savefig_path, metric_input = 'balanced_accuracie', label_x='Balanced accuracy', lim_y=[0.4,1] )
+                visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index', lim_y=[0, 0.8] )
+                visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision', lim_y=[0.4, 0.85])
+                visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', lim_y=[0.5, 1])
+                visualize_t_student_matrix(r, savefig_path, N = 10)
+
+        if config['dataset'] == 'pen-based':
+            # read results
+            path_results = './results/results_pen-based.csv'
+            r = pd.read_csv(path_results)
+            if os.path.isfile(path_results):
+                savefig_path = './results/{}/'.format(config['dataset'])
+                visualize_results(r, savefig_path, metric_input = 'balanced_accuracie', label_x='Balanced accuracy' )
+                visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index' )
+                visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision')
+                visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall')
+                visualize_t_student_matrix(r, savefig_path, N=10)
+
+        if config['dataset'] == 'adult':
+            # read results
+            path_results = './results/results_adult.csv'
+            r = pd.read_csv(path_results)
+            if os.path.isfile(path_results):
+                savefig_path = './results/{}/'.format(config['dataset'])
+                visualize_results(r, savefig_path, metric_input = 'balanced_accuracie', label_x='Balanced accuracy' )
+                visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index' )
+                visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision')
+                visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall')
+                visualize_t_student_matrix(r, savefig_path, N=10)
 
 if __name__ == '__main__':
     main()
