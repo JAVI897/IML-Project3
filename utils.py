@@ -2,9 +2,9 @@ import torch
 import os
 import pandas as pd
 
-def save_results(config, knn_config, kfold_results):
+def save_results(config, knn_config, kfold_results, cols_to_add):
     path = './results/results_{}.csv'.format(config['dataset'])
-    cols = ['acc_fold_{}'.format(i) for i in range(10)] + ['time_fold_{}'.format(i) for i in range(10)] + ['mean_acc','sd_mean_acc','mean_exec_time','sd_exec_time']
+    cols = ['acc_fold_{}'.format(i) for i in range(10)] + ['time_fold_{}'.format(i) for i in range(10)] + cols_to_add
 
     df_aux = pd.DataFrame([kfold_results], columns=cols)
     df_aux = df_aux.round(4)
@@ -22,6 +22,12 @@ def save_results(config, knn_config, kfold_results):
         df_aux.to_csv(path, index=False)
 
 def euclidean_matrix(X_new, X, W):
+    """
+    :param X_new:
+    :param X:
+    :param W:
+    :return: euclidean matrix
+    """
     torch.cuda.empty_cache()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('[INFO] Computations using: {}'.format('GPU' if torch.cuda.is_available() else 'cpu'))
@@ -34,7 +40,38 @@ def euclidean_matrix(X_new, X, W):
     print('[INFO] Distance computed!')
     return d.cpu().detach().numpy()
 
+def euclidean_matrix2(X_new, X, W):
+    """
+    :param X_new:
+    :param X:
+    :param W:
+    :return: Weighted euclidean distance
+    A more efficient way of computing euclidean distance
+    Adapted to weighted euclidean distance from:
+    https://nenadmarkus.com/p/all-pairs-euclidean/
+    """
+    torch.cuda.empty_cache()
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print('[INFO] Computations using: {}'.format('GPU' if torch.cuda.is_available() else 'cpu'))
+    X_new = torch.from_numpy(X_new).to(device)
+    X = torch.from_numpy(X).to(device)
+    W = torch.from_numpy(W).to(device)
+
+    sqrX_new = torch.sum( W*torch.pow(X_new, 2), 1, keepdim=True).expand(X_new.shape[0], X.shape[0])
+    sqrX = torch.sum( W*torch.pow(X, 2), 1, keepdim=True).expand(X.shape[0], X_new.shape[0]).t()
+
+    d = torch.sqrt( sqrX_new - 2*torch.mm(W*X_new, torch.transpose(X, 0, 1)) + sqrX )
+    print('[INFO] Distance computed!')
+    return d.cpu().detach().numpy()
+
 def minkowski_matrix(X_new, X, W, p):
+    """
+    :param X_new:
+    :param X:
+    :param W:
+    :param p:
+    :return: minkowski distance
+    """
     torch.cuda.empty_cache()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('[INFO] Computations using: {}'.format('GPU' if torch.cuda.is_available() else 'cpu'))
@@ -47,7 +84,14 @@ def minkowski_matrix(X_new, X, W, p):
     print('[INFO] Distance computed!')
     return d.cpu().detach().numpy()
 
+
 def cosine_matrix(X_new, X, W):
+    """
+    :param X_new:
+    :param X:
+    :param W:
+    :return: cosine distance
+    """
     torch.cuda.empty_cache()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('[INFO] Computations using: {}'.format('GPU' if torch.cuda.is_available() else 'cpu'))

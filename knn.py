@@ -6,6 +6,7 @@ from sklearn.preprocessing import normalize
 from scipy.spatial.distance import cdist
 from utils import *
 from math import exp
+import time
 
 class KNN:
     def __init__(self, n_neighbors=5,
@@ -56,6 +57,8 @@ class KNN:
         return self.fit(X, Y).predict(X)
 
     def compute_weights(self):
+        start = time.time()
+
         if self.weights == 'uniform':
             self.W = np.ones((self.X.shape[1],))
 
@@ -65,11 +68,15 @@ class KNN:
         elif self.weights == 'relief':
             self.W = relief.ReliefF().fit(self.X, self.Y).w_
 
+        self.time_computation_weights = time.time() - start
+
     def computeDistanceMatrix(self, X_new):
+
+        start = time.time()
 
         if self.metric == 'euclidean':
             if self.metric_gpu:
-                dist_matrix = euclidean_matrix(X_new, self.X, self.W)
+                dist_matrix = euclidean_matrix2(X_new, self.X, self.W)
             else:
                 dist_matrix = cdist(X_new, self.X, metric='minkowski', p=2, w=self.W)
 
@@ -84,7 +91,7 @@ class KNN:
                 dist_matrix = cosine_matrix(X_new, self.X, self.W)
             else:
                 dist_matrix = cdist(X_new, self.X, metric='cosine', w=self.W)
-
+        self.time_computation_distance = time.time() - start
         return dist_matrix
 
     def vote(self, labels, number_classes, distances=None):
