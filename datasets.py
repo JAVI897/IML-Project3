@@ -135,4 +135,4 @@ def preprocess_pen_based(file_name_train, file_name_test):
     X_train = X_train.drop(['a17', 'split'], axis = 1)
     X_test = X_test.drop(['a17', 'split'], axis = 1)
 
-    return X_train, X_test, Y_train, Y_test
+    return X_train, X_test, Y_train.astype(int), Y_test.astype(int)
