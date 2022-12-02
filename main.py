@@ -18,8 +18,8 @@ def configuration():
 def main():
     config = configuration()
     #### GRIDSEARCH
-    for weight in ['uniform', 'info_gain']: ## ['uniform', 'info_gain', 'relief']
-        for metric in ['minkowski', 'euclidean', 'cosine']: ## ['minkowski', 'euclidean', 'cosine']
+    for weight in ['uniform']: ## ['uniform', 'info_gain', 'relief']
+        for metric in ['euclidean', 'cosine']: ## ['minkowski', 'euclidean', 'cosine']
             for vot in ['majority', 'inverse_distance', 'shepards']: ## ['majority', 'inverse_distance', 'shepards']
                 for k in range(1, 30, 5):
                     knn_config = {'n_neighbors': k,

@@ -95,7 +95,7 @@ def kfold(config, knn_config: dict, use_precomputed = True):
 
         exec_time.append(running_time)
         accuracies.append(accuracy_score(y_pred, Y_test))
-        kappas.append(cohen_kappa_score(y_pred, Y_test, labels=np.unique(y_pred) ))
+        kappas.append(cohen_kappa_score(y_pred, Y_test ))
         balanced_accuracies.append(balanced_accuracy_score(y_pred, Y_test))
         macro_precision.append(precision_score(y_pred, Y_test, average = 'macro', labels=np.unique(y_pred) ))
         macro_recall.append(recall_score(y_pred, Y_test, average = 'macro', labels=np.unique(y_pred) ))

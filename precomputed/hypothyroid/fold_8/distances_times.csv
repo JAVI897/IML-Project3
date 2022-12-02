@@ -1,0 +1,16 @@
+Unnamed: 0,name,time
+0.0,distance_minkowski_p_1_weight_uniform.npy,0.071552038192749
+,distance_minkowski_p_3_weight_uniform.npy,0.1481080055236816
+,distance_minkowski_p_4_weight_uniform.npy,0.1085596084594726
+,distance_euclidean_p_2_weight_uniform.npy,0.0407557487487793
+,distance_cosine_p_2_weight_uniform.npy,0.0388436317443847
+,distance_minkowski_p_1_weight_info_gain.npy,0.0807743072509765
+,distance_minkowski_p_3_weight_info_gain.npy,0.0786430835723877
+,distance_minkowski_p_4_weight_info_gain.npy,0.1075994968414306
+,distance_euclidean_p_2_weight_info_gain.npy,0.0404980182647705
+,distance_cosine_p_2_weight_info_gain.npy,0.0399448871612548
+,distance_minkowski_p_1_weight_relief.npy,0.0720562934875488
+,distance_minkowski_p_3_weight_relief.npy,0.1957018375396728
+,distance_minkowski_p_4_weight_relief.npy,0.107621431350708
+,distance_euclidean_p_2_weight_relief.npy,0.0407295227050781
+,distance_cosine_p_2_weight_relief.npy,0.03872084617614746
