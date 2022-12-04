@@ -5,7 +5,8 @@ import numpy as np
 from sklearn.compose import make_column_transformer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import StandardScaler
+#from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.impute import KNNImputer
 
 def preprocess_adult(file_name_train, file_name_test):
@@ -42,7 +43,7 @@ def preprocess_adult(file_name_train, file_name_test):
 
     # Numerical variables
     for c in numerical:
-        df[c] = StandardScaler().fit_transform(df[c].values.reshape(-1, 1))
+        df[c] = MinMaxScaler().fit_transform(df[c].values.reshape(-1, 1))
 
     df['class'] = df['class'].replace({'>50K': 0, '<=50K': 1})
 
@@ -52,7 +53,8 @@ def preprocess_adult(file_name_train, file_name_test):
     Y_test = X_test['class']
     X_train = X_train.drop(['class', 'split'], axis = 1)
     X_test = X_test.drop(['class', 'split'], axis = 1)
-    return X_train, X_test, Y_train, Y_test
+    binary_vbles_mask = [1 if X_test[c].unique().shape[0] == 2 else 0 for c in X_test.columns]
+    return X_train, X_test, Y_train, Y_test, binary_vbles_mask
 
 def preprocess_hypothyroid(file_name_train, file_name_test):
     data = arff.loadarff(file_name_train)
@@ -96,7 +98,7 @@ def preprocess_hypothyroid(file_name_train, file_name_test):
 
     numeric_vbles = ['age', 'TSH', 'T3', 'TT4', 'T4U', 'FTI']
     for c in numeric_vbles:
-        df[c] = StandardScaler().fit_transform(df[c].values.reshape(-1, 1))
+        df[c] = MinMaxScaler().fit_transform(df[c].values.reshape(-1, 1))
 
     df['Class'] = df['Class'].replace({'negative': 0,
                                        'compensated_hypothyroid': 1,
@@ -109,7 +111,8 @@ def preprocess_hypothyroid(file_name_train, file_name_test):
     Y_test = X_test['Class']
     X_train = X_train.drop(['Class', 'split'], axis = 1)
     X_test = X_test.drop(['Class', 'split'], axis = 1)
-    return X_train, X_test, Y_train, Y_test
+    binary_vbles_mask = [ 1 if X_test[c].unique().shape[0] == 2 else 0 for c in X_test.columns]
+    return X_train, X_test, Y_train, Y_test, binary_vbles_mask
 
 def preprocess_pen_based(file_name_train, file_name_test):
 
@@ -126,7 +129,7 @@ def preprocess_pen_based(file_name_train, file_name_test):
     numeric_vbles = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9',
                      'a10', 'a11', 'a12', 'a13', 'a14', 'a15', 'a16']
     for c in numeric_vbles:
-        df[c] = StandardScaler().fit_transform(df[c].values.reshape(-1, 1))
+        df[c] = MinMaxScaler().fit_transform(df[c].values.reshape(-1, 1))
 
     X_train = df.loc[df['split'] == 'Train']
     X_test = df.loc[df['split'] == 'Test']
@@ -134,5 +137,5 @@ def preprocess_pen_based(file_name_train, file_name_test):
     Y_test = X_test['a17']
     X_train = X_train.drop(['a17', 'split'], axis = 1)
     X_test = X_test.drop(['a17', 'split'], axis = 1)
-
-    return X_train, X_test, Y_train.astype(int), Y_test.astype(int)
+    binary_vbles_mask = [1 if X_test[c].unique().shape[0] == 2 else 0 for c in X_test.columns]
+    return X_train, X_test, Y_train.astype(int), Y_test.astype(int), binary_vbles_mask

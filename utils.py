@@ -50,8 +50,8 @@ def euclidean_matrix2(X_new, X, W):
     Adapted to weighted euclidean distance from:
     https://nenadmarkus.com/p/all-pairs-euclidean/
     """
-    torch.cuda.empty_cache()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    torch.cuda.empty_cache()
     print('[INFO] Computations using: {}'.format('GPU' if torch.cuda.is_available() else 'cpu'))
     X_new = torch.from_numpy(X_new).to(device)
     X = torch.from_numpy(X).to(device)

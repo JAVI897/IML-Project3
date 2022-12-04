@@ -16,7 +16,8 @@ class KNN:
                  p=1,
                  distances_precomputed = None,
                  weights_precomputed = None,
-                 metric_gpu = True
+                 metric_gpu = True,
+                 binary_vbles_mask = None
                  ):
 
         self.k = n_neighbors
@@ -26,7 +27,7 @@ class KNN:
         if weights not in ['uniform', 'info_gain', 'relief']:
             raise ValueError("weight is expected to be named as; 'uniform', 'info_gain' or 'relief', got {} instead".format(weights))
         self.weights = weights
-        if metric not in ['minkowski', 'euclidean', 'cosine']:
+        if metric not in ['minkowski', 'euclidean', 'cosine', 'euclidean-hamming', 'cosine-hamming']:
             raise ValueError("metric is expected to be named as; 'minkowski', 'euclidean' or 'cosine', got {} instead".format(metric))
         if metric == 'minkowski' and p <= 0:
             raise ValueError("p must be greater than 0")
@@ -35,6 +36,7 @@ class KNN:
         self.distances = distances_precomputed
         self.W = weights_precomputed
         self.metric_gpu = metric_gpu
+        self.binary_vbles_mask = binary_vbles_mask
 
     def fit(self, X, Y):
         self.X = X
@@ -91,6 +93,21 @@ class KNN:
                 dist_matrix = cosine_matrix(X_new, self.X, self.W)
             else:
                 dist_matrix = cdist(X_new, self.X, metric='cosine', w=self.W)
+
+        elif self.metric == 'euclidean-hamming':
+            binary_vbles = [i for i, v in enumerate(self.binary_vbles_mask) if v == 1]
+            numeric_vbles = [i for i, v in enumerate(self.binary_vbles_mask) if v == 0]
+            dist_euclidean = euclidean_matrix2(X_new[:,numeric_vbles], self.X[:,numeric_vbles], np.ones((len(numeric_vbles),)) )
+            dist_hamming = cdist(X_new[:,binary_vbles], self.X[:,binary_vbles], metric='hamming', w = np.ones((len(binary_vbles),)) )
+            dist_matrix = 1/2 * (dist_euclidean + dist_hamming)
+
+        elif self.metric == 'cosine-hamming':
+            binary_vbles = [i for i, v in enumerate(self.binary_vbles_mask) if v == 1]
+            numeric_vbles = [i for i, v in enumerate(self.binary_vbles_mask) if v == 0]
+            dist_cosine = cosine_matrix(X_new[:,numeric_vbles], self.X[:,numeric_vbles], np.ones((len(numeric_vbles),)) )
+            dist_hamming = cdist(X_new[:,binary_vbles], self.X[:,binary_vbles], metric='hamming', w = np.ones((len(binary_vbles),)) )
+            dist_matrix = 1/2 * (dist_cosine + dist_hamming)
+
         self.time_computation_distance = time.time() - start
         return dist_matrix
 

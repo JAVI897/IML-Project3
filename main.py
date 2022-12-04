@@ -28,14 +28,14 @@ def main():
     if config['run_experiments']:
         #### GRIDSEARCH
         for weight in ['uniform', 'info_gain', 'relief']: ## ['uniform', 'info_gain', 'relief']
-            for metric in ['minkowski']: ## ['minkowski', 'euclidean', 'cosine']
+            for metric in ['minkowski', 'euclidean', 'cosine', 'euclidean-hamming', 'cosine-hamming']: ## ['minkowski', 'euclidean', 'cosine', 'euclidean-hamming', 'cosine-hamming']
                 for vot in ['majority', 'inverse_distance', 'shepards']: ## ['majority', 'inverse_distance', 'shepards']
-                    for k in range(1, 30, 5):
+                    for k in [1, 3, 5, 7, 15, 25, 50]:
                         knn_config = {'n_neighbors': k,
                                       'weights': weight,
                                       'metric': metric,
                                       'voting': vot,
-                                      'p': 2,
+                                       'p': 2,
                                       }
                         print('[INFO] Running. n_neighbors:{} weights:{} metric:{} voting:{}'.format(k, weight, metric, vot))
                         if metric == 'minkowski':
@@ -52,10 +52,10 @@ def main():
             r = pd.read_csv(path_results)
             if os.path.isfile(path_results):
                 savefig_path = './results/{}/'.format(config['dataset'])
-                visualize_results(r, savefig_path, metric_input = 'balanced_accuracie', label_x='Balanced accuracy', lim_y=[0.4,1] )
-                visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index', lim_y=[0, 0.8] )
-                visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision', lim_y=[0.4, 0.85])
-                visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', lim_y=[0.5, 1])
+                visualize_results(r, savefig_path, metric_input = 'balanced_accuracie', label_x='Balanced accuracy', lim_y=[0.4,1], categorical_distances = ['euclidean-hamming', 'cosine-hamming'] )
+                visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index', lim_y=[0, 0.8], categorical_distances = ['euclidean-hamming', 'cosine-hamming'] )
+                visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision', lim_y=[0.4, 0.85], categorical_distances = ['euclidean-hamming', 'cosine-hamming'])
+                visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', lim_y=[0.5, 1], categorical_distances = ['euclidean-hamming', 'cosine-hamming'])
                 visualize_t_student_matrix(r, savefig_path, N = 10)
 
         if config['dataset'] == 'pen-based':

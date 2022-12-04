@@ -22,8 +22,8 @@ def kfold(config, knn_config: dict, use_precomputed = True):
     for i in range(10):
         dataset_name, preprocess_func = select_function_name[config['dataset']]
         start = time.time()
-        X_train, X_test, Y_train, Y_test = preprocess_func('./10_folds/{}/{}.fold.00000{}.train.arff'.format(dataset_name, dataset_name, i ),
-                                                           './10_folds/{}/{}.fold.00000{}.test.arff'.format(dataset_name, dataset_name, i ))
+        X_train, X_test, Y_train, Y_test, binary_vbles_mask = preprocess_func('./10_folds/{}/{}.fold.00000{}.train.arff'.format(dataset_name, dataset_name, i ),
+                                                                              './10_folds/{}/{}.fold.00000{}.test.arff'.format( dataset_name, dataset_name, i ))
 
         time_distance_precomputed = None
         precomputed_distance = None
@@ -59,7 +59,8 @@ def kfold(config, knn_config: dict, use_precomputed = True):
                      p           = knn_config['p'],
                      distances_precomputed = precomputed_distance,
                      weights_precomputed = precomputed_weights,
-                     metric_gpu = True if config['gpu'] == 'yes' else False
+                     metric_gpu = True if config['gpu'] == 'yes' else False,
+                     binary_vbles_mask = binary_vbles_mask
                      )
         knn_model.fit(X_train.values, Y_train.values)
         y_pred = knn_model.predict(X_test.values)
