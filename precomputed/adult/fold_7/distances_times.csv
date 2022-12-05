@@ -1,0 +1,10 @@
+Unnamed: 0,name,time
+0.0,distance_cosine_p_2_weight_uniform.npy,1.9910240173339844
+,distance_cosine_p_2_weight_info_gain.npy,1.7702820301055908
+,distance_cosine_p_2_weight_relief.npy,2.178009510040283
+,distance_euclidean_p_2_weight_uniform.npy,15.31825828552246
+,distance_euclidean_p_2_weight_info_gain.npy,1.3411240577697754
+,distance_euclidean_p_2_weight_relief.npy,18.90518832206726
+,distance_minkowski_p_1_weight_uniform.npy,74.86590528488159
+,distance_minkowski_p_3_weight_uniform.npy,269.20592212677
+,distance_minkowski_p_4_weight_uniform.npy,271.39802956581116

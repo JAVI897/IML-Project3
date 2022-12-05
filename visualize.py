@@ -32,7 +32,7 @@ def visualize_t_student_matrix(r, savefig_path, N = 10):
 def visualize_results(r, savefig_path, metric_input = 'accuracie', label_x = 'Accuracy', lim_y=None, categorical_distances = None):
     number_k = list(r['n_neighbors'].unique())
     plt.rcParams.update({'font.size': 14})
-    fig = plt.figure(figsize= (24.5,28) if categorical_distances is None else (24.5,35) )
+    fig = plt.figure(figsize= (24.5,35) if categorical_distances is None else (24.5,35) )
     plt.subplots_adjust(wspace=0.15,
                         hspace=0.15)
 
@@ -55,7 +55,7 @@ def visualize_results(r, savefig_path, metric_input = 'accuracie', label_x = 'Ac
                         lower_bound = np.array(plot_mean) - 0.15*np.array(plot_mean)*np.array(plot_sd)
                         upper_bound = np.array(plot_mean) + 0.15*np.array(plot_mean)*np.array(plot_sd)
 
-                        plt.plot( number_k, plot_mean, label='{}-{}-{}'.format(m, w, v), linestyle = 'solid', marker = 'o')
+                        plt.plot( number_k, plot_mean, label='{}-{}'.format(m, v), linestyle = 'solid', marker = 'o')
                         plt.fill_between( number_k, upper_bound, lower_bound, alpha=0.3)
                     except:
                         pass

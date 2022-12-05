@@ -1,11 +1,62 @@
 import time
 from datasets import preprocess_adult, preprocess_hypothyroid, preprocess_pen_based
 from knn import KNN
+from reduction import reductionKnnAlgorithm
 from sklearn.metrics import accuracy_score, cohen_kappa_score, balanced_accuracy_score, precision_score, recall_score
 import numpy as np
 import os
 import pandas as pd
 from utils import save_results
+
+def kfold_reduction(config, knn_config: dict ):
+    accuracies = []
+    balanced_accuracies = []
+    kappas = []
+    macro_precision = []
+    macro_recall = []
+    exec_time = []
+    time_reduction = []
+
+    select_function_name = {'adult': ('adult', preprocess_adult),
+                            'hyp': ('hypothyroid', preprocess_hypothyroid ),
+                            'pen-based': ('pen-based', preprocess_pen_based)}
+
+
+    for i in range(10):
+        dataset_name, preprocess_func = select_function_name[config['dataset']]
+        start = time.time()
+        X_train, X_test, Y_train, Y_test, binary_vbles_mask = preprocess_func('./10_folds/{}/{}.fold.00000{}.train.arff'.format(dataset_name, dataset_name, i ),
+                                                                              './10_folds/{}/{}.fold.00000{}.test.arff'.format( dataset_name, dataset_name, i ))
+
+        knn_model = reductionKnnAlgorithm(
+                     n_neighbors = knn_config['n_neighbors'],
+                     weights     = knn_config['weights'],
+                     metric      = knn_config['metric'],
+                     voting      = knn_config['voting'],
+                     p           = knn_config['p'],
+                     metric_gpu = True if config['gpu'] == 'yes' else False,
+                     binary_vbles_mask = binary_vbles_mask,
+                     reduction = knn_config['reduction']
+                     )
+
+        knn_model.fit(X_train.values, Y_train.values)
+        y_pred = knn_model.predict(X_test.values)
+
+        running_time = time.time() - start
+
+        time_reduction.append(knn_model.time_computation_reduction)
+        exec_time.append(running_time - knn_model.time_computation_reduction)
+        accuracies.append(accuracy_score(y_pred, Y_test))
+        kappas.append(cohen_kappa_score(y_pred, Y_test ))
+        balanced_accuracies.append(balanced_accuracy_score(y_pred, Y_test))
+        macro_precision.append(precision_score(y_pred, Y_test, average = 'macro', labels=np.unique(y_pred) ))
+        macro_recall.append(recall_score(y_pred, Y_test, average = 'macro', labels=np.unique(y_pred) ))
+
+    for name_metric, metric_folds in [('exec_time', exec_time), ('accuracie', accuracies),
+                                      ('kappa', kappas), ('balanced_accuracie', balanced_accuracies),
+                                      ('macro_precision', macro_precision), ('macro_recall', macro_recall)]:
+        print('[INFO] Metric: {} --- CV -> Mean {} STD: {}'.format(name_metric, np.mean(metric_folds), np.std(metric_folds)))
+
 
 def kfold(config, knn_config: dict, use_precomputed = True):
     accuracies = []
