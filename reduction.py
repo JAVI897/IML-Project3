@@ -38,6 +38,7 @@ class reductionKnnAlgorithm(KNN):
 
     def fit(self, X, Y):
 
+        print('[INFO] Original shape of data matrix: ', X.shape)
         start = time.time()
 
         if self.reduction == 'RNN':
@@ -49,6 +50,7 @@ class reductionKnnAlgorithm(KNN):
         else:
             X_red, Y_red = X, Y
 
+        print('[INFO] New shape of data matrix: ', X_red.shape)
         self.time_computation_reduction = time.time() - start
 
         self.X = X_red
