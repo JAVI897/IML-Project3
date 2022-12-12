@@ -1,6 +1,6 @@
 # Work 3: Lazy learning exercise
 
-KNN (K-Nearest Neighbors) is a supervised machine learning algorithm used for classification and regression. The algorithm works by finding the 'K' nearest neighbors of a given data point and using those neighbors to predict the class of the data point. KNN is a non-parametric and lazy learning algorithm that does not make any assumptions about the underlying data distribution. In this project it has been implemented KNN with several reduction algorithms. To validate the model several datasets are used, namely; Adult, Pen-Based and Hypothyroid.
+KNN (K-Nearest Neighbors) is a supervised machine learning algorithm used for classification and regression. The algorithm works by finding the 'K' nearest neighbors of a given data point and using those neighbors to predict the class of the data point. KNN is a non-parametric and lazy learning algorithm that does not make any assumptions about the underlying data distribution. In this project it has been implemented KNN with several reduction algorithms. To validate the model, several datasets are used, namely; Adult, Pen-Based and Hypothyroid.
 
 ### Installation 
 
