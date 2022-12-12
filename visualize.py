@@ -6,7 +6,7 @@ import pandas as pd
 
 #### T-student p-values
 
-def visualize_t_student_matrix(r, savefig_path, N = 10):
+def visualize_stat_test_matrix(r, savefig_path, N = 10, stat = 'ttest'):
 
     best_N = r.sort_values(by = 'mean_balanced_accuracie', ascending = False).iloc[:N].reset_index()
     best_N['name'] = best_N[['n_neighbors', 'weights', 'metric', 'voting']].apply(lambda row: '_'.join(row.values.astype(str)), axis=1)
@@ -16,7 +16,13 @@ def visualize_t_student_matrix(r, savefig_path, N = 10):
         results_acc_1 = r1[cols_acc].values
         for i2, r2 in best_N.iterrows():
             results_acc_2 = r2[cols_acc].values
-            zeros[i1, i2] = round(stats.ttest_ind(results_acc_1, results_acc_2).pvalue, 3)
+            if stat == 'ttest':
+                zeros[i1, i2] = round(stats.ttest_ind(results_acc_1, results_acc_2).pvalue, 3)
+            elif stat == 'wilcoxon':
+                try:
+                    zeros[i1, i2] = round(stats.wilcoxon(results_acc_1, results_acc_2).pvalue, 3)
+                except:
+                    zeros[i1, i2] = 1
     matrix_df = pd.DataFrame(zeros,
              columns = best_N.name.values,
                index = best_N.name.values)
@@ -26,7 +32,7 @@ def visualize_t_student_matrix(r, savefig_path, N = 10):
     sns.heatmap(matrix_df, annot=True, cmap=sns.diverging_palette(12, 120, n=256))
     plt.title('p-values', loc = 'right')
     plt.grid(False)
-    plt.savefig(savefig_path + 'p_values_N_{}.png'.format(N), bbox_inches='tight', dpi=300)
+    plt.savefig(savefig_path + 'p_values_N_{}_{}.png'.format(N, stat), bbox_inches='tight', dpi=300)
 
 #### K vs metric (accuracy, kappa etc.) with confidence intervals
 def visualize_results(r, savefig_path, metric_input = 'accuracie', label_x = 'Accuracy', lim_y=None, categorical_distances = None):

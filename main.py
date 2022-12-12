@@ -2,7 +2,7 @@ import argparse
 from kfold import kfold, kfold_reduction
 import pandas as pd
 import os
-from visualize import visualize_results, visualize_t_student_matrix
+from visualize import visualize_results, visualize_stat_test_matrix
 
 parser = argparse.ArgumentParser()
 
@@ -91,7 +91,8 @@ def main():
                 visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index', lim_y=[0, 0.8], categorical_distances = ['euclidean-hamming', 'cosine-hamming'] )
                 visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision', lim_y=[0.4, 0.85], categorical_distances = ['euclidean-hamming', 'cosine-hamming'])
                 visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', lim_y=[0.5, 1], categorical_distances = ['euclidean-hamming', 'cosine-hamming'])
-                visualize_t_student_matrix(r, savefig_path, N = 10)
+                visualize_stat_test_matrix(r, savefig_path, N = 10)
+                visualize_stat_test_matrix(r, savefig_path, N = 10, stat ='wilcoxon')
 
         if config['dataset'] == 'pen-based':
             # read results
@@ -104,7 +105,8 @@ def main():
                 visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index', lim_y=[0.95, 1] )
                 visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision', lim_y=[0.95, 1])
                 visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', lim_y=[0.95, 1])
-                visualize_t_student_matrix(r, savefig_path, N=10)
+                visualize_stat_test_matrix(r, savefig_path, N=10)
+                visualize_stat_test_matrix(r, savefig_path, N=10, stat='wilcoxon')
 
         if config['dataset'] == 'adult':
             # read results
@@ -117,7 +119,8 @@ def main():
                 visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index', categorical_distances = ['euclidean-hamming', 'cosine-hamming'] )
                 visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision', categorical_distances = ['euclidean-hamming', 'cosine-hamming'])
                 visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', categorical_distances = ['euclidean-hamming', 'cosine-hamming'])
-                visualize_t_student_matrix(r, savefig_path, N=10)
+                visualize_stat_test_matrix(r, savefig_path, N=10)
+                visualize_stat_test_matrix(r, savefig_path, N=10, stat='wilcoxon')
 
 if __name__ == '__main__':
     main()
