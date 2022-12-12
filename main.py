@@ -84,6 +84,7 @@ def main():
             # read results
             path_results = './results/results_hyp.csv'
             r = pd.read_csv(path_results)
+            r = r.drop_duplicates(subset=['n_neighbors', 'weights', 'metric', 'voting'])
             if os.path.isfile(path_results):
                 savefig_path = './results/{}/'.format(config['dataset'])
                 visualize_results(r, savefig_path, metric_input = 'balanced_accuracie', label_x='Balanced accuracy', lim_y=[0.4,1], categorical_distances = ['euclidean-hamming', 'cosine-hamming'] )
@@ -96,6 +97,7 @@ def main():
             # read results
             path_results = './results/results_pen-based.csv'
             r = pd.read_csv(path_results)
+            r = r.drop_duplicates(subset=['n_neighbors', 'weights', 'metric', 'voting'])
             if os.path.isfile(path_results):
                 savefig_path = './results/{}/'.format(config['dataset'])
                 visualize_results(r, savefig_path, metric_input = 'balanced_accuracie', label_x='Balanced accuracy', lim_y=[0.95, 1] )
@@ -108,12 +110,13 @@ def main():
             # read results
             path_results = './results/results_adult.csv'
             r = pd.read_csv(path_results)
+            r = r.drop_duplicates(subset=['n_neighbors', 'weights', 'metric', 'voting'])
             if os.path.isfile(path_results):
                 savefig_path = './results/{}/'.format(config['dataset'])
-                visualize_results(r, savefig_path, metric_input = 'balanced_accuracie', label_x='Balanced accuracy' )
-                visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index' )
-                visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision')
-                visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall')
+                visualize_results(r, savefig_path, metric_input = 'balanced_accuracie', label_x='Balanced accuracy', categorical_distances = ['euclidean-hamming', 'cosine-hamming'] )
+                visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index', categorical_distances = ['euclidean-hamming', 'cosine-hamming'] )
+                visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision', categorical_distances = ['euclidean-hamming', 'cosine-hamming'])
+                visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', categorical_distances = ['euclidean-hamming', 'cosine-hamming'])
                 visualize_t_student_matrix(r, savefig_path, N=10)
 
 if __name__ == '__main__':

@@ -30,7 +30,6 @@ def visualize_t_student_matrix(r, savefig_path, N = 10):
 
 #### K vs metric (accuracy, kappa etc.) with confidence intervals
 def visualize_results(r, savefig_path, metric_input = 'accuracie', label_x = 'Accuracy', lim_y=None, categorical_distances = None):
-    number_k = list(r['n_neighbors'].unique())
     plt.rcParams.update({'font.size': 14})
     fig = plt.figure(figsize= (24.5,35) if categorical_distances is None else (24.5,35) )
     plt.subplots_adjust(wspace=0.15,
@@ -42,6 +41,11 @@ def visualize_results(r, savefig_path, metric_input = 'accuracie', label_x = 'Ac
                 plt.subplot(4, 3, i_w+1+(3*i_m))
                 for v in ['majority', 'inverse_distance', 'shepards']:
                     try:
+
+                        number_k = np.unique(r.loc[  (r['weights'] == w) &
+                                           (r['metric']  == m)  &
+                                           (r['voting'] == v)]['n_neighbors'].values)
+
                         plot_mean = [r.loc[(r['weights'] == w) &
                                            (r['metric']  == m)  &
                                            (r['voting'] == v) &
@@ -73,6 +77,11 @@ def visualize_results(r, savefig_path, metric_input = 'accuracie', label_x = 'Ac
             try:
                 for m in categorical_distances:
                     w = 'uniform'
+
+                    number_k = np.unique(r.loc[(r['weights'] == w) &
+                                               (r['metric'] == m) &
+                                               (r['voting'] == v)]['n_neighbors'].values)
+
                     plot_mean = [r.loc[(r['weights'] == w) &
                                        (r['metric'] == m) &
                                        (r['voting'] == v) &
