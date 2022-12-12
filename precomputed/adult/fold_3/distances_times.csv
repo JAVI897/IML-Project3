@@ -8,3 +8,5 @@ Unnamed: 0,name,time
 ,distance_minkowski_p_1_weight_uniform.npy,39.83725118637085
 ,distance_minkowski_p_3_weight_uniform.npy,268.6886548995972
 ,distance_minkowski_p_4_weight_uniform.npy,271.4824185371399
+,distance_euclidean_p_2_weight_info_gain.npy,14.889668941497805
+,distance_euclidean_p_2_weight_relief.npy,2.7885351181030273

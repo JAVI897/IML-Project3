@@ -62,9 +62,9 @@ def main():
         else:
             #### GRIDSEARCH
             for weight in ['relief']: ## ['uniform', 'info_gain', 'relief']
-                for metric in ['minkowski']: ## ['minkowski', 'euclidean', 'cosine', 'euclidean-hamming', 'cosine-hamming']
+                for metric in ['euclidean']: ## ['minkowski', 'euclidean', 'cosine', 'euclidean-hamming', 'cosine-hamming']
                     for vot in ['shepards']: ## ['majority', 'inverse_distance', 'shepards']
-                        for k in [25, 50]:
+                        for k in [1, 3, 5, 7, 15, 25, 50]: #changed from [25,50]
                             knn_config = {'n_neighbors': k,
                                           'weights': weight,
                                           'metric': metric,
