@@ -114,3 +114,20 @@ def visualize_results(r, savefig_path, metric_input = 'accuracie', label_x = 'Ac
             plt.legend(loc='lower left', prop={'size': 13})
 
     plt.savefig(savefig_path+'{}.png'.format(metric_input), bbox_inches='tight', dpi=300)
+
+
+def plot_times(r, savefig_path):
+    r['metric_weights'] = r['metric'] + '-' + r['weights']
+    fig = plt.figure(figsize=(15, 7.5))
+    plt.subplots_adjust(wspace=0.05,
+                        hspace=0.15)
+    for i, voting in enumerate(['majority', 'inverse_distance', 'shepards']):
+        plt.subplot(1, 3, i + 1)
+        sns.boxplot(data=r.loc[r['voting'] == voting], x="mean_exec_time", y="metric_weights")
+        plt.xscale('log')
+        plt.xlabel('Average time execution')
+        plt.title('Voting = {}'.format(voting))
+        if i + 1 > 1:
+            plt.yticks([])
+        plt.ylabel('')
+    plt.savefig(savefig_path + 'time_plot_metrics.png', bbox_inches='tight', dpi=300)

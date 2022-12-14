@@ -2,7 +2,7 @@ import argparse
 from kfold import kfold, kfold_reduction
 import pandas as pd
 import os
-from visualize import visualize_results, visualize_stat_test_matrix
+from visualize import visualize_results, visualize_stat_test_matrix, plot_times
 
 parser = argparse.ArgumentParser()
 
@@ -93,6 +93,7 @@ def main():
                 visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', lim_y=[0.5, 1], categorical_distances = ['euclidean-hamming', 'cosine-hamming'])
                 visualize_stat_test_matrix(r, savefig_path, N = 10)
                 visualize_stat_test_matrix(r, savefig_path, N = 10, stat ='wilcoxon')
+                plot_times(r, savefig_path)
 
         if config['dataset'] == 'pen-based':
             # read results
@@ -107,6 +108,7 @@ def main():
                 visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', lim_y=[0.95, 1])
                 visualize_stat_test_matrix(r, savefig_path, N=10)
                 visualize_stat_test_matrix(r, savefig_path, N=10, stat='wilcoxon')
+                plot_times(r, savefig_path)
 
         if config['dataset'] == 'adult':
             # read results
@@ -121,6 +123,7 @@ def main():
                 visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', categorical_distances = ['euclidean-hamming', 'cosine-hamming'])
                 visualize_stat_test_matrix(r, savefig_path, N=10)
                 visualize_stat_test_matrix(r, savefig_path, N=10, stat='wilcoxon')
+                plot_times(r, savefig_path)
 
 if __name__ == '__main__':
     main()
