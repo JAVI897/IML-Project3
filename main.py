@@ -2,7 +2,7 @@ import argparse
 from kfold import kfold, kfold_reduction
 import pandas as pd
 import os
-from visualize import visualize_results, visualize_stat_test_matrix, plot_times
+from visualize import visualize_results, visualize_stat_test_matrix, plot_times, plot_precision_kappa_balanced_acc
 
 parser = argparse.ArgumentParser()
 
@@ -94,6 +94,7 @@ def main():
                 visualize_stat_test_matrix(r, savefig_path, N = 10)
                 visualize_stat_test_matrix(r, savefig_path, N = 10, stat ='wilcoxon')
                 plot_times(r, savefig_path)
+                plot_precision_kappa_balanced_acc(r, savefig_path)
 
         if config['dataset'] == 'pen-based':
             # read results
@@ -109,6 +110,7 @@ def main():
                 visualize_stat_test_matrix(r, savefig_path, N=10)
                 visualize_stat_test_matrix(r, savefig_path, N=10, stat='wilcoxon')
                 plot_times(r, savefig_path)
+                plot_precision_kappa_balanced_acc(r, savefig_path, ylim=(0.8, 1))
 
         if config['dataset'] == 'adult':
             # read results
@@ -124,6 +126,7 @@ def main():
                 visualize_stat_test_matrix(r, savefig_path, N=10)
                 visualize_stat_test_matrix(r, savefig_path, N=10, stat='wilcoxon')
                 plot_times(r, savefig_path)
+                plot_precision_kappa_balanced_acc(r, savefig_path)
 
 if __name__ == '__main__':
     main()

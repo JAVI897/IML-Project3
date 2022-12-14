@@ -131,3 +131,44 @@ def plot_times(r, savefig_path):
             plt.yticks([])
         plt.ylabel('')
     plt.savefig(savefig_path + 'time_plot_metrics.png', bbox_inches='tight', dpi=300)
+
+def plot_precision_kappa_balanced_acc(r, savefig_path, ylim = None):
+    best = r.sort_values(by='mean_balanced_accuracie', ascending=False).iloc[:1].reset_index()
+    r['name'] = r[['n_neighbors', 'weights', 'metric', 'voting']].apply(lambda row: '_'.join(row.values.astype(str)),
+                                                                        axis=1)
+    best['name'] = best[['n_neighbors', 'weights', 'metric', 'voting']].apply(
+        lambda row: '_'.join(row.values.astype(str)), axis=1)
+
+    p_value_results = []
+    cols_acc = ['acc_fold_{}'.format(i) for i in range(10)]
+    results_acc_best = best[cols_acc].values[0]
+    for i1, r1 in r.iterrows():
+        results_acc_1 = r1[cols_acc].values
+        try:
+            p = round(stats.wilcoxon(results_acc_1, results_acc_best).pvalue, 3)
+        except:
+            p = 1
+        p_value_results.append(p)
+    r['p_value_best'] = p_value_results
+
+    fig = plt.figure(figsize=(17, 7))
+
+    for i, metric in enumerate(['mean_macro_precision', 'mean_kappa']):
+        plt.subplot(1, 2, i + 1)
+        sns.scatterplot(data=r.loc[r['p_value_best'] >= 0.05], x='mean_balanced_accuracie',
+                        y=metric, hue='voting', s=90,
+                        marker='X')
+
+        sns.scatterplot(data=r.loc[r['p_value_best'] < 0.05], x='mean_balanced_accuracie', marker='o',
+                        y=metric, s=70, alpha=0.1, hue='voting', legend=False)
+
+        sns.scatterplot(data=best, x='mean_balanced_accuracie',
+                        y=metric, marker='X', s=300, color='red')
+
+        plt.title('Balanced accuracy versus {}'.format(metric))
+        plt.ylabel(metric)
+        plt.xlabel('Balanced accuracy')
+        if ylim is not None:
+            plt.ylim(ylim)
+        plt.grid()
+    plt.savefig(savefig_path + 'precision_kappa_balanced_acc.png', bbox_inches='tight', dpi=300)
