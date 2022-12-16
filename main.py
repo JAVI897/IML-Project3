@@ -2,7 +2,7 @@ import argparse
 from kfold import kfold, kfold_reduction
 import pandas as pd
 import os
-from visualize import visualize_results, visualize_stat_test_matrix, plot_times, plot_precision_kappa_balanced_acc
+from visualize import visualize_results, visualize_stat_test_matrix, plot_times, plot_precision_kappa_balanced_acc, tukey_confidence_interval
 
 parser = argparse.ArgumentParser()
 
@@ -87,6 +87,7 @@ def main():
             r = r.drop_duplicates(subset=['n_neighbors', 'weights', 'metric', 'voting'])
             if os.path.isfile(path_results):
                 savefig_path = './results/{}/'.format(config['dataset'])
+                tukey_confidence_interval(r, savefig_path)
                 visualize_results(r, savefig_path, metric_input = 'balanced_accuracie', label_x='Balanced accuracy', lim_y=[0.4,1], categorical_distances = ['euclidean-hamming', 'cosine-hamming'] )
                 visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index', lim_y=[0, 0.8], categorical_distances = ['euclidean-hamming', 'cosine-hamming'] )
                 visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision', lim_y=[0.4, 0.85], categorical_distances = ['euclidean-hamming', 'cosine-hamming'])
@@ -103,6 +104,7 @@ def main():
             r = r.drop_duplicates(subset=['n_neighbors', 'weights', 'metric', 'voting'])
             if os.path.isfile(path_results):
                 savefig_path = './results/{}/'.format(config['dataset'])
+                tukey_confidence_interval(r, savefig_path)
                 visualize_results(r, savefig_path, metric_input = 'balanced_accuracie', label_x='Balanced accuracy', lim_y=[0.95, 1] )
                 visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index', lim_y=[0.95, 1] )
                 visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision', lim_y=[0.95, 1])
@@ -119,10 +121,11 @@ def main():
             r = r.drop_duplicates(subset=['n_neighbors', 'weights', 'metric', 'voting'])
             if os.path.isfile(path_results):
                 savefig_path = './results/{}/'.format(config['dataset'])
-                visualize_results(r, savefig_path, metric_input = 'balanced_accuracie', label_x='Balanced accuracy', categorical_distances = ['euclidean-hamming', 'cosine-hamming'] )
-                visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index', categorical_distances = ['euclidean-hamming', 'cosine-hamming'] )
-                visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision', categorical_distances = ['euclidean-hamming', 'cosine-hamming'])
-                visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', categorical_distances = ['euclidean-hamming', 'cosine-hamming'])
+                tukey_confidence_interval(r, savefig_path)
+                visualize_results(r, savefig_path, metric_input = 'balanced_accuracie', label_x='Balanced accuracy', categorical_distances = ['euclidean-hamming', 'cosine-hamming'], lim_y=[0.7, 0.8] )
+                visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index', categorical_distances = ['euclidean-hamming', 'cosine-hamming'], lim_y=[0.4, 0.55] )
+                visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision', categorical_distances = ['euclidean-hamming', 'cosine-hamming'], lim_y=[0.7, 0.8])
+                visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', categorical_distances = ['euclidean-hamming', 'cosine-hamming'], lim_y=[0.7, 0.8])
                 visualize_stat_test_matrix(r, savefig_path, N=10)
                 visualize_stat_test_matrix(r, savefig_path, N=10, stat='wilcoxon')
                 plot_times(r, savefig_path)

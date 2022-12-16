@@ -3,6 +3,7 @@ import numpy as np
 import seaborn as sns
 from scipy import stats
 import pandas as pd
+from statsmodels.stats.multicomp import MultiComparison
 
 #### T-student p-values
 
@@ -172,3 +173,19 @@ def plot_precision_kappa_balanced_acc(r, savefig_path, ylim = None):
             plt.ylim(ylim)
         plt.grid()
     plt.savefig(savefig_path + 'precision_kappa_balanced_acc.png', bbox_inches='tight', dpi=300)
+
+def tukey_confidence_interval(r, savefig_path, N = 10):
+    best_N = r.sort_values(by = 'mean_balanced_accuracie', ascending = False).iloc[:N].reset_index()
+    best_N['name'] = best_N[['n_neighbors', 'weights', 'metric', 'voting']].apply(lambda row: '_'.join(row.values.astype(str)), axis=1)
+
+    comparison_df = best_N[['acc_fold_0', 'name']].values
+    for n in ['acc_fold_{}'.format(i) for i in range(1, 10)]:
+        comparison_df = np.vstack([comparison_df, best_N[[n, 'name']].values])
+    comparison_df = pd.DataFrame(comparison_df, columns = ['acc_fold', 'name'])
+    comparison_df["acc_fold"] = pd.to_numeric(comparison_df["acc_fold"])
+
+    fold_data = MultiComparison(comparison_df['acc_fold'], comparison_df['name'])
+    results = fold_data.tukeyhsd()
+    print(results.summary())
+    results.plot_simultaneous(comparison_name = best_N.iloc[0]['name'], figsize=(17, 8))
+    plt.savefig(savefig_path + 'tukeyHSD.png', bbox_inches='tight', dpi=300)
