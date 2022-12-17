@@ -92,6 +92,8 @@ def main():
                 visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index', lim_y=[0, 0.8], categorical_distances = ['euclidean-hamming', 'cosine-hamming'] )
                 visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision', lim_y=[0.4, 0.85], categorical_distances = ['euclidean-hamming', 'cosine-hamming'])
                 visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', lim_y=[0.5, 1], categorical_distances = ['euclidean-hamming', 'cosine-hamming'])
+                visualize_results(r, savefig_path, metric_input='exec_time', label_x='Time execution', lim_y=[0, 85], categorical_distances=['euclidean-hamming', 'cosine-hamming'],
+                                  log = False, fill=False, legend_loc = 'center')
                 visualize_stat_test_matrix(r, savefig_path, N = 10)
                 visualize_stat_test_matrix(r, savefig_path, N = 10, stat ='wilcoxon')
                 plot_times(r, savefig_path)
@@ -109,6 +111,9 @@ def main():
                 visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index', lim_y=[0.95, 1] )
                 visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision', lim_y=[0.95, 1])
                 visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', lim_y=[0.95, 1])
+                visualize_results(r, savefig_path, metric_input='exec_time', label_x='Time execution')
+                visualize_results(r, savefig_path, metric_input='exec_time', label_x='Time execution', lim_y=[0, 150],
+                                  log=False, fill=False, legend_loc='center')
                 visualize_stat_test_matrix(r, savefig_path, N=10)
                 visualize_stat_test_matrix(r, savefig_path, N=10, stat='wilcoxon')
                 plot_times(r, savefig_path)
@@ -126,6 +131,9 @@ def main():
                 visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index', categorical_distances = ['euclidean-hamming', 'cosine-hamming'], lim_y=[0.4, 0.55] )
                 visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision', categorical_distances = ['euclidean-hamming', 'cosine-hamming'], lim_y=[0.7, 0.8])
                 visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', categorical_distances = ['euclidean-hamming', 'cosine-hamming'], lim_y=[0.7, 0.8])
+                visualize_results(r, savefig_path, metric_input='exec_time', label_x='Time execution', lim_y=[0, 800],
+                                  categorical_distances=['euclidean-hamming', 'cosine-hamming'],
+                                  log=False, fill=False, legend_loc='best')
                 visualize_stat_test_matrix(r, savefig_path, N=10)
                 visualize_stat_test_matrix(r, savefig_path, N=10, stat='wilcoxon')
                 plot_times(r, savefig_path)

@@ -36,7 +36,7 @@ def visualize_stat_test_matrix(r, savefig_path, N = 10, stat = 'ttest'):
     plt.savefig(savefig_path + 'p_values_N_{}_{}.png'.format(N, stat), bbox_inches='tight', dpi=300)
 
 #### K vs metric (accuracy, kappa etc.) with confidence intervals
-def visualize_results(r, savefig_path, metric_input = 'accuracie', label_x = 'Accuracy', lim_y=None, categorical_distances = None):
+def visualize_results(r, savefig_path, metric_input = 'accuracie', label_x = 'Accuracy', lim_y=None, categorical_distances = None, log = False, fill=True, legend_loc='lower left'):
     plt.rcParams.update({'font.size': 14})
     fig = plt.figure(figsize= (24.5,35) if categorical_distances is None else (24.5,35) )
     plt.subplots_adjust(wspace=0.15,
@@ -67,7 +67,10 @@ def visualize_results(r, savefig_path, metric_input = 'accuracie', label_x = 'Ac
                         upper_bound = np.array(plot_mean) + 0.15*np.array(plot_mean)*np.array(plot_sd)
 
                         plt.plot( number_k, plot_mean, label='{}-{}'.format(m, v), linestyle = 'solid', marker = 'o')
-                        plt.fill_between( number_k, upper_bound, lower_bound, alpha=0.3)
+                        if fill:
+                            plt.fill_between( number_k, upper_bound, lower_bound, alpha=0.3)
+                        if log:
+                            plt.yscale('log')
                     except:
                         pass
                 plt.title('Distance: {} -- Feature weight: {}'.format(m.replace('_4', ''), w))
@@ -76,7 +79,7 @@ def visualize_results(r, savefig_path, metric_input = 'accuracie', label_x = 'Ac
                 plt.ylabel(label_x if i_w == 0 else '')
                 plt.xlabel('Number of neighbors')
                 plt.grid(True)
-                plt.legend(loc = 'lower left', prop={'size': 13})
+                plt.legend(loc = legend_loc, prop={'size': 13})
 
     if categorical_distances is not None:
         for l, v in enumerate(['majority', 'inverse_distance', 'shepards']):
@@ -103,7 +106,10 @@ def visualize_results(r, savefig_path, metric_input = 'accuracie', label_x = 'Ac
                     upper_bound = np.array(plot_mean) + 0.15 * np.array(plot_mean) * np.array(plot_sd)
 
                     plt.plot(number_k, plot_mean, label='{}'.format(m), linestyle='solid', marker='o')
-                    plt.fill_between(number_k, upper_bound, lower_bound, alpha=0.3)
+                    if fill:
+                        plt.fill_between(number_k, upper_bound, lower_bound, alpha=0.3)
+                    if log:
+                        plt.yscale('log')
             except:
                 pass
             plt.title('Mixed distance - Voting: {}'.format( v ))
@@ -112,7 +118,7 @@ def visualize_results(r, savefig_path, metric_input = 'accuracie', label_x = 'Ac
             plt.ylabel(label_x if l == 0 else '')
             plt.xlabel('Number of neighbors')
             plt.grid(True)
-            plt.legend(loc='lower left', prop={'size': 13})
+            plt.legend(loc=legend_loc, prop={'size': 13})
 
     plt.savefig(savefig_path+'{}.png'.format(metric_input), bbox_inches='tight', dpi=300)
 
