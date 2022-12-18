@@ -33,16 +33,16 @@ def main():
             # BEST RESULTS OF KNN IN THE CORRESPONDING DATASET
             # change best results
             datasets_config_best_hyp = {'hyp': {
-                                                'n_neighbors': 3,
+                                                'n_neighbors': 50,
                                                 'weights': 'info_gain',
-                                                'metric': 'euclidean',
+                                                'metric': 'euclidean-hamming',
                                                 'voting': 'majority',
                                                 'p': 2
                                                 },
                                        'adult': {
-                                                'n_neighbors': 3,
+                                                'n_neighbors': 50,
                                                 'weights': 'info_gain',
-                                                'metric': 'euclidean',
+                                                'metric': 'euclidean-hamming',
                                                 'voting': 'majority',
                                                 'p': 2
                                                 },
@@ -55,7 +55,7 @@ def main():
                                                      }
                                        }
             best_hyp = datasets_config_best_hyp[config['dataset']]
-            for reduction_alg in ['RNN', 'RENN', 'DROP3']:
+            for reduction_alg in ['RENN']:
                 best_hyp['reduction'] = reduction_alg
                 kfold_reduction(config, best_hyp)
 
@@ -127,7 +127,7 @@ def main():
             if os.path.isfile(path_results):
                 savefig_path = './results/{}/'.format(config['dataset'])
                 tukey_confidence_interval(r, savefig_path)
-                visualize_results(r, savefig_path, metric_input = 'balanced_accuracie', label_x='Balanced accuracy', categorical_distances = ['euclidean-hamming', 'cosine-hamming'], lim_y=[0.7, 0.8] )
+                visualize_results(r, savefig_path, metric_input = 'balanced_accuracie', label_x='Balanced accuracy', categorical_distances = ['euclidean-hamming', 'cosine-hamming'], lim_y=[0.7, 0.85] )
                 visualize_results(r, savefig_path, metric_input='kappa', label_x='Kappa Index', categorical_distances = ['euclidean-hamming', 'cosine-hamming'], lim_y=[0.4, 0.55] )
                 visualize_results(r, savefig_path, metric_input='macro_precision', label_x='Average Precision', categorical_distances = ['euclidean-hamming', 'cosine-hamming'], lim_y=[0.7, 0.8])
                 visualize_results(r, savefig_path, metric_input='macro_recall', label_x='Average Recall', categorical_distances = ['euclidean-hamming', 'cosine-hamming'], lim_y=[0.7, 0.8])
