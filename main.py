@@ -41,7 +41,7 @@ def main():
                                                 },
                                        'adult': {
                                                 'n_neighbors': 50,
-                                                'weights': 'info_gain',
+                                                'weights': 'uniform',
                                                 'metric': 'euclidean-hamming',
                                                 'voting': 'majority',
                                                 'p': 2
