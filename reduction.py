@@ -91,13 +91,13 @@ class reductionKnnAlgorithm(KNN):
                 dM = np.delete(dM, j, axis=0)
                 dM = np.delete(dM, j, axis=1)
 
-            X = X_orig[selected_individuals]
-            Y = Y_orig[selected_individuals]
+                X = X_orig[selected_individuals]
+                Y = Y_orig[selected_individuals]
 
-            knn_indexes = [np.argsort(dM[i, :])[1:self.k+1] for i in range(X.shape[0])]
-            labels_of_neighbours = [Y[indexes].astype(np.int) for indexes in knn_indexes]
-            N_c = np.unique(Y).shape[0]
-            y_pred = self.vote(labels_of_neighbours, N_c)
+                knn_indexes = [np.argsort(dM[i, :])[1:self.k+1] for i in range(X.shape[0])]
+                labels_of_neighbours = [Y[indexes].astype(np.int) for indexes in knn_indexes]
+                N_c = np.unique(Y).shape[0]
+                y_pred = self.vote(labels_of_neighbours, N_c)
 
         return X_orig[selected_individuals], Y_orig[selected_individuals]
 
