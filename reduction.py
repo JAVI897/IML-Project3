@@ -75,12 +75,13 @@ class reductionKnnAlgorithm(KNN):
         self.compute_weights()
         dM = self.computeDistanceMatrix(X)
         N = X.shape[0]
-        knn_indexes = [np.argsort(dM[i, :])[:self.k] for i in range(N)]
+        knn_indexes = [np.argsort(dM[i, :])[1:self.k+1] for i in range(N)]
         labels_of_neighbours = [Y[indexes].astype(np.int) for indexes in knn_indexes]
         N_c = np.unique(Y).shape[0]
         y_pred = self.vote(labels_of_neighbours, N_c)
         selected_individuals = [m for m in range(N)]
         delete_individuals = 0
+
         for j in range(N):
             print('[INFO] Analyzing sample: {} Individuals deleted: {}'.format(j, delete_individuals))
             count_dic = Counter([y_pred[l] for l in knn_indexes[j - delete_individuals]])
@@ -93,7 +94,7 @@ class reductionKnnAlgorithm(KNN):
             X = X_orig[selected_individuals]
             Y = Y_orig[selected_individuals]
 
-            knn_indexes = [np.argsort(dM[i, :])[:self.k] for i in range(X.shape[0])]
+            knn_indexes = [np.argsort(dM[i, :])[1:self.k+1] for i in range(X.shape[0])]
             labels_of_neighbours = [Y[indexes].astype(np.int) for indexes in knn_indexes]
             N_c = np.unique(Y).shape[0]
             y_pred = self.vote(labels_of_neighbours, N_c)

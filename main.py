@@ -47,11 +47,11 @@ def main():
                                                 'p': 2
                                                 },
                                        'pen-based': {
-                                                     'n_neighbors': 3,
+                                                     'n_neighbors': 1,
                                                      'weights': 'info_gain',
-                                                     'metric': 'euclidean',
+                                                     'metric': 'minkowski',
                                                      'voting': 'majority',
-                                                     'p': 2
+                                                     'p': 1
                                                      }
                                        }
             best_hyp = datasets_config_best_hyp[config['dataset']]

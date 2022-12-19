@@ -20,9 +20,10 @@ def visualize_stat_test_matrix(r, savefig_path, N = 10, stat = 'ttest'):
             if stat == 'ttest':
                 zeros[i1, i2] = round(stats.ttest_ind(results_acc_1, results_acc_2).pvalue, 3)
             elif stat == 'wilcoxon':
+                # for small sample sizes, and when there are ties; wilcoxon method can throw an exception
                 try:
                     zeros[i1, i2] = round(stats.wilcoxon(results_acc_1, results_acc_2).pvalue, 3)
-                except:
+                except ValueError as e:
                     zeros[i1, i2] = 1
     matrix_df = pd.DataFrame(zeros,
              columns = best_N.name.values,
@@ -33,7 +34,7 @@ def visualize_stat_test_matrix(r, savefig_path, N = 10, stat = 'ttest'):
     sns.heatmap(matrix_df, annot=True, cmap=sns.diverging_palette(12, 120, n=256))
     plt.title('p-values', loc = 'right')
     plt.grid(False)
-    plt.savefig(savefig_path + 'p_values_N_{}_{}.png'.format(N, stat), bbox_inches='tight', dpi=300)
+    plt.savefig(savefig_path + 'p_values_N_{}_{}.png'.format(N, stat), bbox_inches='tight', dpi=100)
 
 #### K vs metric (accuracy, kappa etc.) with confidence intervals
 def visualize_results(r, savefig_path, metric_input = 'accuracie', label_x = 'Accuracy', lim_y=None, categorical_distances = None, log = False, fill=True, legend_loc='lower left'):
@@ -120,7 +121,7 @@ def visualize_results(r, savefig_path, metric_input = 'accuracie', label_x = 'Ac
             plt.grid(True)
             plt.legend(loc=legend_loc, prop={'size': 13})
 
-    plt.savefig(savefig_path+'{}.png'.format(metric_input), bbox_inches='tight', dpi=300)
+    plt.savefig(savefig_path+'{}.png'.format(metric_input), bbox_inches='tight', dpi=100)
 
 
 def plot_times(r, savefig_path):
@@ -137,7 +138,7 @@ def plot_times(r, savefig_path):
         if i + 1 > 1:
             plt.yticks([])
         plt.ylabel('')
-    plt.savefig(savefig_path + 'time_plot_metrics.png', bbox_inches='tight', dpi=300)
+    plt.savefig(savefig_path + 'time_plot_metrics.png', bbox_inches='tight', dpi=100)
 
 def plot_precision_kappa_balanced_acc(r, savefig_path, ylim = None):
     best = r.sort_values(by='mean_balanced_accuracie', ascending=False).iloc[:1].reset_index()
@@ -178,7 +179,7 @@ def plot_precision_kappa_balanced_acc(r, savefig_path, ylim = None):
         if ylim is not None:
             plt.ylim(ylim)
         plt.grid()
-    plt.savefig(savefig_path + 'precision_kappa_balanced_acc.png', bbox_inches='tight', dpi=300)
+    plt.savefig(savefig_path + 'precision_kappa_balanced_acc.png', bbox_inches='tight', dpi=100)
 
 def tukey_confidence_interval(r, savefig_path, N = 10):
     best_N = r.sort_values(by = 'mean_balanced_accuracie', ascending = False).iloc[:N].reset_index()
@@ -194,4 +195,4 @@ def tukey_confidence_interval(r, savefig_path, N = 10):
     results = fold_data.tukeyhsd()
     print(results.summary())
     results.plot_simultaneous(comparison_name = best_N.iloc[0]['name'], figsize=(17, 8))
-    plt.savefig(savefig_path + 'tukeyHSD.png', bbox_inches='tight', dpi=300)
+    plt.savefig(savefig_path + 'tukeyHSD.png', bbox_inches='tight', dpi=100)
