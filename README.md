@@ -49,7 +49,7 @@ Specifying the parameters  according to the following table:
 | **run_experiments**   | If set to 'yes', 10-fold cross-validation experiments are performed over a set of hyperparameters. Results are saved in a csv file in the results folder for each dataset.                                        |
 | **reduction**         | If set to 'yes', experiments are performed for different reduction algorithms using the best hyperparameters found for each dataset which are defined in main.py.                                              |
 | **visualize_results** | If set to 'yes', different plots will be generated and saved in the results folder inside the corresponding dataset's folder. In order to generate the plots, the results csv files must be in the results folder. |
-| **gpu**               | If set to 'no', pytorch is not used to compute the distance matrices during experiments and scipy cdist function is used instead.                                                                                 |
+| **pytorch**           | If set to 'no', pytorch is not used to compute the distance matrices during experiments and scipy cdist function is used instead.                                                                                 |
 
 For each experiment, the code will save the distances matrices for each fold and each combination of distance-weight which will be reused in other executions so that executions are computed faster and the same computation is not performed twice. Also, execution times are saved the first time a distance matrix is computed, and those times are added to the execution time for those executions that use a precomputed distance matrix.
 

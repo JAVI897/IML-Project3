@@ -97,7 +97,10 @@ class KNN:
         elif self.metric == 'euclidean-hamming':
             binary_vbles = [i for i, v in enumerate(self.binary_vbles_mask) if v == 1]
             numeric_vbles = [i for i, v in enumerate(self.binary_vbles_mask) if v == 0]
-            dist_euclidean = euclidean_matrix2(X_new[:,numeric_vbles], self.X[:,numeric_vbles], np.ones((len(numeric_vbles),)) )
+            if self.metric_gpu:
+                dist_euclidean = euclidean_matrix2(X_new[:,numeric_vbles], self.X[:,numeric_vbles], np.ones((len(numeric_vbles),)) )
+            else:
+                dist_euclidean = cdist(X_new[:,numeric_vbles], self.X[:,numeric_vbles], metric='minkowski', p=2)
             dist_hamming = cdist(X_new[:,binary_vbles], self.X[:,binary_vbles], metric='hamming', w = np.ones((len(binary_vbles),)) )
             dist_matrix = 1/2 * (dist_euclidean + dist_hamming)
 

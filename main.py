@@ -11,13 +11,13 @@ parser.add_argument("--dataset", type=str, default='adult', choices=['adult', 'h
 parser.add_argument("--run_experiments", type=str, default='yes', choices=['yes', 'no'])
 parser.add_argument("--reduction", type=str, default='no', choices=['yes', 'no'])
 parser.add_argument("--visualize_results", type=str, default='yes', choices=['yes', 'no'])
-parser.add_argument("--gpu", type=str, default='yes', choices=['yes', 'no'])
+parser.add_argument("--pytorch", type=str, default='yes', choices=['yes', 'no'])
 con = parser.parse_args()
 
 def configuration():
     config = {
                 'dataset':con.dataset,
-                'gpu':con.gpu,
+                'gpu':con.pytorch,
                 'run_experiments': True if con.run_experiments == 'yes' else False,
                 'visualize_results': True if con.visualize_results == 'yes' else False,
                 'reduction': True if con.reduction == 'yes' else False
