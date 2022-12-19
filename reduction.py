@@ -69,37 +69,21 @@ class reductionKnnAlgorithm(KNN):
         pass
 
     def renn(self, X, Y):
-        X_orig, Y_orig = X.copy(), Y.copy()
         self.X = X
         self.Y = Y
         self.compute_weights()
-        dM = self.computeDistanceMatrix(X)
-        N = X.shape[0]
-        knn_indexes = [np.argsort(dM[i, :])[1:self.k+1] for i in range(N)]
-        labels_of_neighbours = [Y[indexes].astype(np.int) for indexes in knn_indexes]
-        N_c = np.unique(Y).shape[0]
-        y_pred = self.vote(labels_of_neighbours, N_c)
-        selected_individuals = [m for m in range(N)]
-        delete_individuals = 0
+        repetitions = 4
+        for i in range(repetitions):
+            N = self.X.shape[0]
+            dM = self.computeDistanceMatrix(self.X)
+            knn_indexes = [np.argsort(dM[i, :])[1:self.k+1] for i in range(N)]
+            labels_of_neighbours = [self.Y[indexes].astype(np.int) for indexes in knn_indexes]
+            N_c = np.unique(self.Y).shape[0]
+            y_pred = self.vote(labels_of_neighbours, N_c)
+            selected_ind = [i for i in range(N) if y_pred[i] == self.Y[i]]
+            self.X, self.Y = self.X[selected_ind], self.Y[selected_ind]
 
-        for j in range(N):
-            print('[INFO] Analyzing sample: {} Individuals deleted: {}'.format(j, delete_individuals))
-            count_dic = Counter([y_pred[l] for l in knn_indexes[j - delete_individuals]])
-            if y_pred[j - delete_individuals] != max(count_dic, key=count_dic.get):
-                selected_individuals.remove(j)
-                delete_individuals += 1
-                dM = np.delete(dM, j, axis=0)
-                dM = np.delete(dM, j, axis=1)
-
-                X = X_orig[selected_individuals]
-                Y = Y_orig[selected_individuals]
-
-                knn_indexes = [np.argsort(dM[i, :])[1:self.k+1] for i in range(X.shape[0])]
-                labels_of_neighbours = [Y[indexes].astype(np.int) for indexes in knn_indexes]
-                N_c = np.unique(Y).shape[0]
-                y_pred = self.vote(labels_of_neighbours, N_c)
-
-        return X_orig[selected_individuals], Y_orig[selected_individuals]
+        return self.X, self.Y
 
     def drop3(self, X, Y):
         # DROP3
