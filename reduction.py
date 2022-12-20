@@ -199,6 +199,7 @@ class reductionKnnAlgorithm(KNN):
 
         if len(index_removed) > 0:
             print('[INFO] Individuals deleted: {}'.format(len(index_removed)))
-            return X_removed.drop(index_removed), Y_removed.drop(index_removed)
+            X_removed = np.delete(X_removed, index_removed, axis=0)
+            Y_removed = np.delete(Y_removed, index_removed)
         return X_removed, Y_removed
 
