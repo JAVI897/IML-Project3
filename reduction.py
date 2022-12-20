@@ -34,8 +34,8 @@ class reductionKnnAlgorithm(KNN):
                                                      metric_gpu=metric_gpu,
                                                      binary_vbles_mask=binary_vbles_mask,
                                                      )
-        if reduction not in ['RNN', 'RENN', 'DROP3']:
-            raise ValueError("reduction is expected to be named as; 'RNN', 'RENN' or 'DROP3', got {} instead".format(reduction))
+        if reduction not in ['RNN', 'RENN', 'DROP3', 'None']:
+            raise ValueError("reduction is expected to be named as; 'RNN', 'RENN', 'DROP3' or 'None' got {} instead".format(reduction))
         self.reduction = reduction
 
     def fit(self, X, Y):

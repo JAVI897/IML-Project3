@@ -25,8 +25,15 @@ def kfold_reduction(config, knn_config: dict ):
     for i in range(10):
         dataset_name, preprocess_func = select_function_name[config['dataset']]
         start = time.time()
-        X_train, X_test, Y_train, Y_test, binary_vbles_mask = preprocess_func('./10_folds/{}/{}.fold.00000{}.train.arff'.format(dataset_name, dataset_name, i ),
-                                                                              './10_folds/{}/{}.fold.00000{}.test.arff'.format( dataset_name, dataset_name, i ))
+        if config['dataset'] == 'adult':
+            X_train, X_test, Y_train, Y_test, binary_vbles_mask = preprocess_func(
+                                                                                    './10_folds/{}/{}.fold.00000{}.train.arff'.format(dataset_name, dataset_name, i),
+                                                                                    './10_folds/{}/{}.fold.00000{}.test.arff'.format(dataset_name, dataset_name, i),
+                                                                                     sample = True)
+
+        else:
+            X_train, X_test, Y_train, Y_test, binary_vbles_mask = preprocess_func('./10_folds/{}/{}.fold.00000{}.train.arff'.format(dataset_name, dataset_name, i ),
+                                                                                  './10_folds/{}/{}.fold.00000{}.test.arff'.format( dataset_name, dataset_name, i ))
 
         knn_model = reductionKnnAlgorithm(
                      n_neighbors = knn_config['n_neighbors'],
