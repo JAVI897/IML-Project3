@@ -86,47 +86,45 @@ class reductionKnnAlgorithm(KNN):
         return self.X, self.Y
 
     def drop3(self, X, Y):
-        # DROP3
-        ##fit and predict
+        # fit and predict original data
         self.X = X
         self.Y = Y
         self.compute_weights()
         dM = self.computeDistanceMatrix(X)
         knn_indexes = [np.argsort(dM[i, :])[1:self.k + 1] for i in range(X.shape[0])]
         labels_of_neighbours = [Y[indexes].astype(np.int) for indexes in knn_indexes]
-        N_c = np.unique(Y).shape[0]
-        y_pred = self.vote(labels_of_neighbours, N_c)
+        y_pred = self.vote(labels_of_neighbours, np.unique(Y).shape[0])
 
-        ## Remove instances from original data
+        # Remove instances from original data
         remove_intances = [i for i, y_real in enumerate(Y) if y_pred[i] != y_real]
         if len(remove_intances) > 0:
             print('[INFO] Individuals deleted: {}'.format(len(remove_intances)))
             X_removed = np.delete(X, remove_intances, axis=0)
             Y_removed = np.delete(Y, remove_intances)
+        else:
+            X_removed, Y_removed = X, Y
 
-        # DROP1
-        ##fit K+1
+        # fit new data without removed instance
         self.X = X_removed
         self.Y = Y_removed
         self.compute_weights()
         dM = self.computeDistanceMatrix(X_removed)
+        total_knn_indexes = [np.argsort(dM[i, :]) for i in range(X_removed.shape[0])]
 
-        ##obtain neigbous
-        knn_indexes = [np.argsort(dM[i, :])[1:self.k + 1] for i in range(X_removed.shape[0])]
+        # obtain k neigbours
+        knn_indexes = [knn_indexes[1:self.k + 1] for knn_indexes in total_knn_indexes]
         labels_of_neighbours = [Y_removed[indexes].astype(np.int) for indexes in knn_indexes]
         N_c = np.unique(Y_removed).shape[0]
         y_pred = self.vote(labels_of_neighbours, N_c)
 
-        ##obtain associates
-        associates = [[]] * len(X)
-        for p_idx in range(X_removed.shape[0]):
-            for a_inx in knn_indexes[p_idx]:
-                associates[a_inx].append(p_idx)
+        # obtain associates
+        associates = [[] for _ in range(X_removed.shape[0])]
+        for p_index in range(X_removed.shape[0]):
+            for a_inx in knn_indexes[p_index]:
+                associates[a_inx].append(p_index)
 
-        # DROP2 :
-        ## order of X_removed for removing the instances
-        min_dist, instances, classes = [], [], []
-
+        # order of X_removed for removing the instances
+        min_dist = []
         for p, y_real in enumerate(Y_removed):
             enemies = []
             for i, y_neighbour in enumerate(labels_of_neighbours[p]):
@@ -134,83 +132,45 @@ class reductionKnnAlgorithm(KNN):
                 if y_neighbour != y_real:
                     distance = dM[indexes[i], p]
                     enemies.append(distance)
-
             try:
                 min_dist.append(min(enemies))
             except:
                 min_dist.append(0)
-            instances.append(p)
-            classes.append(y_real)
+        enemies_order = np.argsort(min_dist)[::-1]
 
-        df = pd.DataFrame({'x': instances, 'dist': min_dist, 'y': classes})
-        df = df.sort_values(['dist'], ascending=False)
-        X_ordered = X_removed[np.array(list(df['x']))]
-        y_ordered = Y_removed[ np.array(list(df['y']))]
+        index_removed = []
+        for p_index in enemies_order:
 
-        # DROP1
-        S = [i for i in range(X_ordered.shape[0])]
+            d_without, d_with = 0, 0
+            for a_index in associates[p_index]:
+                # with
+                if y_pred[a_index] == Y_removed[a_index]:
+                    d_with += 1
 
+                # without
+                knn_indexes_without = [knn_index for knn_index in total_knn_indexes[a_index] if knn_index != p_index][
+                                      1:self.k + 1]
+                labels_of_neighbours_without = [Y_removed[knn_indexes_without].astype(np.int)]
+                y_pred_without = self.vote(labels_of_neighbours_without, N_c)
+                if y_pred_without[0] == Y_removed[a_index]:
+                    d_without += 1
 
-        p = 0
-        while p < len(S):
-
-            ## Num. of associates of p classified correctly with p as a neighbour
-            ###fit and predict
-
-            X_with = X_ordered[S,:]
-            y_with = y_ordered[S]
-            self.X = X_with
-            self.Y = y_with
-            self.compute_weights()
-            dM = self.computeDistanceMatrix(X_with)
-            knn_indexes = [np.argsort(dM[i, :])[1:self.k + 1] for i in range(X_with.shape[0])]
-            labels_of_neighbours = [y_with[indexes].astype(np.int) for indexes in knn_indexes]
-            N_c = np.unique(y_with).shape[0]
-            y_pred = self.vote(labels_of_neighbours, N_c)
-
-            print('[INFO] Instance analysed: {}'.format(p))
-
-            ### with
-            try:
-                d_with = sum(map(lambda x: y_with[x] == y_pred[x], associates[p]))
-            except:
-                print('[INFO] Exception within')
-                p += 1
-                continue
-
-            ## Num. of associates of p classified correctly without p as a neighbour.
-            S_without = S.copy()
-            del S_without[p]
-            ###fit and predict
-            X_without = X_ordered[S_without,:]
-            y_without = y_ordered[S_without]
-            self.X = X_without
-            self.Y = y_without
-            self.compute_weights()
-            dM = self.computeDistanceMatrix(X_without)
-            knn_indexes_without = [np.argsort(dM[i, :])[1:self.k + 1] for i in range(X_without.shape[0])]
-            labels_of_neighbours = [y_without[indexes].astype(np.int) for indexes in knn_indexes_without]
-            N_c = np.unique(y_without).shape[0]
-            y_pred = self.vote(labels_of_neighbours, N_c)
-
-            ###without
-            try:
-                d_without = sum(map(lambda x: y_without[x] == y_pred[x], associates[p]))
-            except:
-                p += 1
-                continue
-
-
+            # eq
             if d_without >= d_with:
-                print('[INFO] Instance deleted: {}'.format(p))
-                S = S_without
+                print('[INFO] Instance  removed: {}'.format(p_index))
+                index_removed.append(p_index)
+                for a_index in associates[p_index]:
+                    if p_index in associates[a_index]:
+                        old_knn_indexes = knn_indexes[a_index]
+                        knn_indexes[a_index] = [knn_indexes for knn_indexes in total_knn_indexes[a_index] if
+                                                knn_indexes not in index_removed][1:self.k + 1]
+                        labels_of_neighbours[a_index] = [Y_removed[a_index].astype(np.int)]
+                        y_pred = self.vote(labels_of_neighbours, N_c)
+                        new_neigbour_index = list(set(knn_indexes[a_index]) - set(old_knn_indexes))[0]
+                        associates[new_neigbour_index].append(a_index)
 
-                ###obtain associates
-                associates = [[]] * len(X)
-                for p_idx in range(X_without.shape[0]):
-                    for a_inx in knn_indexes_without[p_idx]:
-                        associates[a_inx].append(p_idx)
+        if len(index_removed) > 0:
+            print('[INFO] Individuals deleted: {}'.format(len(index_removed)))
+            return X_removed.drop(index_removed), Y_removed.drop(index_removed)
+        return X_removed, Y_removed
 
-            p += 1
-
-        return X[S], y[S]
