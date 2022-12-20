@@ -65,8 +65,36 @@ class reductionKnnAlgorithm(KNN):
         if self.W is None:
             self.compute_weights()
 
-    def rnn(self, X, Y):
-        pass
+    def rnn(self, X, Y): # RNN USING k = 1 (1-NN)
+        self.X = X
+        self.Y = Y
+
+        n_elements = X.shape[0]
+
+        # initializing the reduced dataset
+        X_red = X[0:1, :]  # select the first row of the array X
+        Y_red = Y[0:1]  # select the first element of the array y
+
+        for i in range(1, n_elements):  # for each of the elements
+            # find the nearest neighbour of example X[i] in the reduced dataset
+            dist = np.linalg.norm(X[i] - X_red, axis=1)
+            nearest_neighbour = np.argmin(dist)
+
+            # if X[i] is not misclassified by the reduced dataset
+            if Y[i] == Y_red[nearest_neighbour]:
+                # adding X[i] to the reduced dataset
+                X_red = np.concatenate((X_red, X[i:i + 1, :]))
+                Y_red = np.concatenate((Y_red, Y[i:i + 1]))
+            else:
+                # removing the nearest neighbour from the reduced dataset
+                X_red = np.delete(X_red, nearest_neighbour, axis=0)
+                Y_red = np.delete(Y_red, nearest_neighbour)
+                # adding X[i] to the reduced dataset
+                X_red = np.concatenate((X_red, X[i:i + 1, :]))
+                Y_red = np.concatenate((Y_red, Y[i:i + 1]))
+
+        return X_red, Y_red
+
 
     def renn(self, X, Y):
         self.X = X
