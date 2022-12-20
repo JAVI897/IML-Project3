@@ -51,12 +51,11 @@ def kfold_reduction(config, knn_config: dict ):
         balanced_accuracies.append(balanced_accuracy_score(y_pred, Y_test))
         macro_precision.append(precision_score(y_pred, Y_test, average = 'macro', labels=np.unique(y_pred) ))
         macro_recall.append(recall_score(y_pred, Y_test, average = 'macro', labels=np.unique(y_pred) ))
-
+        print('[INFO] Fold {}'.format(i))
         for name_metric, metric_folds in [('exec_time', exec_time[-1]), ('accuracie', accuracies[-1]),
                                           ('kappa', kappas[-1]), ('balanced_accuracie', balanced_accuracies[-1]),
                                           ('macro_precision', macro_precision[-1]), ('macro_recall', macro_recall[-1]),
                                           ('time_reduction', time_reduction[-1])]:
-            print('[INFO] Fold {}'.format(i))
             print('[INFO] Metric: {} --- CV -> Mean {}'.format(name_metric, metric_folds))
 
     for name_metric, metric_folds in [('exec_time', exec_time), ('accuracie', accuracies),
