@@ -112,6 +112,7 @@ class KNN:
             dist_matrix = 1/2 * (dist_cosine + dist_hamming)
 
         self.time_computation_distance = time.time() - start
+        print('[INFO] Distance matrix size in Bytes: {}'.format(dist_matrix.nbytes))
 
         return dist_matrix
 
