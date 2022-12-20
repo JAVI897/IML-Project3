@@ -9,7 +9,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.impute import KNNImputer
 
-def preprocess_adult(file_name_train, file_name_test):
+def preprocess_adult(file_name_train, file_name_test, sample = False):
     data = arff.loadarff(file_name_train)
     data_test = arff.loadarff(file_name_test)
     df = pd.DataFrame(data[0])
@@ -46,7 +46,8 @@ def preprocess_adult(file_name_train, file_name_test):
         df[c] = MinMaxScaler().fit_transform(df[c].values.reshape(-1, 1))
 
     df['class'] = df['class'].replace({'>50K': 0, '<=50K': 1})
-
+    if sample:
+        df = df.sample(20000, random_state = 66)
     X_train = df.loc[df['split'] == 'Train']
     X_test = df.loc[df['split'] == 'Test']
     Y_train = X_train['class']
