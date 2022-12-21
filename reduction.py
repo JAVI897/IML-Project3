@@ -194,8 +194,13 @@ class reductionKnnAlgorithm(KNN):
                                                 knn_indexes not in index_removed][1:self.k + 1]
                         labels_of_neighbours[a_index] = [Y_removed[a_index].astype(np.int)]
                         y_pred = self.vote(labels_of_neighbours, N_c)
-                        new_neigbour_index = list(set(knn_indexes[a_index]) - set(old_knn_indexes))[0]
-                        associates[new_neigbour_index].append(a_index)
+
+                        new_neigbour_index = list(set(knn_indexes[a_index]) - set(old_knn_indexes))
+                        try:
+                            for i in new_neigbour_index:
+                                associates[new_neigbour_index[i]].append(a_index)
+                        except:
+                            pass
 
         if len(index_removed) > 0:
             print('[INFO] Individuals deleted: {}'.format(len(index_removed)))
