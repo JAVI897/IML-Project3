@@ -3,8 +3,10 @@ import numpy as np
 import seaborn as sns
 from scipy import stats
 import pandas as pd
+import warnings
 from statsmodels.stats.multicomp import MultiComparison
-
+# for small sample sizes, and when there are ties; wilcoxon method can throw an exception
+warnings.filterwarnings("ignore")
 #### T-student p-values
 
 def visualize_stat_test_matrix(r, savefig_path, N = 10, stat = 'ttest'):
@@ -20,7 +22,6 @@ def visualize_stat_test_matrix(r, savefig_path, N = 10, stat = 'ttest'):
             if stat == 'ttest':
                 zeros[i1, i2] = round(stats.ttest_ind(results_acc_1, results_acc_2).pvalue, 3)
             elif stat == 'wilcoxon':
-                # for small sample sizes, and when there are ties; wilcoxon method can throw an exception
                 try:
                     zeros[i1, i2] = round(stats.wilcoxon(results_acc_1, results_acc_2).pvalue, 3)
                 except ValueError as e:

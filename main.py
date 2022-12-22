@@ -11,7 +11,7 @@ parser.add_argument("--dataset", type=str, default='adult', choices=['adult', 'h
 parser.add_argument("--run_experiments", type=str, default='yes', choices=['yes', 'no'])
 parser.add_argument("--reduction", type=str, default='no', choices=['yes', 'no'])
 parser.add_argument("--visualize_results", type=str, default='yes', choices=['yes', 'no'])
-parser.add_argument("--pytorch", type=str, default='yes', choices=['yes', 'no'])
+parser.add_argument("--pytorch", type=str, default='no', choices=['yes', 'no'])
 con = parser.parse_args()
 
 def configuration():
@@ -55,16 +55,16 @@ def main():
                                                      }
                                        }
             best_hyp = datasets_config_best_hyp[config['dataset']]
-            for reduction_alg in ['None']: #['RENN']
+            for reduction_alg in ['None', 'RENN', 'RNN', 'DROP3']: #['RENN']
                 print('[INFO] Using reduction: {}'.format(reduction_alg))
                 best_hyp['reduction'] = reduction_alg
                 kfold_reduction(config, best_hyp)
 
         else:
             #### GRIDSEARCH
-            for weight in ['relief']: ## ['uniform', 'info_gain', 'relief']
-                for metric in ['euclidean']: ## ['minkowski', 'euclidean', 'cosine', 'euclidean-hamming', 'cosine-hamming']
-                    for vot in ['shepards']: ## ['majority', 'inverse_distance', 'shepards']
+            for weight in ['uniform', 'info_gain', 'relief']: ## ['uniform', 'info_gain', 'relief']
+                for metric in ['minkowski', 'euclidean', 'cosine', 'euclidean-hamming', 'cosine-hamming']: ## ['minkowski', 'euclidean', 'cosine', 'euclidean-hamming', 'cosine-hamming']
+                    for vot in ['majority', 'inverse_distance', 'shepards']: ## ['majority', 'inverse_distance', 'shepards']
                         for k in [1, 3, 5, 7, 15, 25, 50]: #changed from [25,50]
                             knn_config = {'n_neighbors': k,
                                           'weights': weight,
