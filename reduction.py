@@ -169,7 +169,7 @@ class reductionKnnAlgorithm(KNN):
         index_removed = []
         for p_index in enemies_order:
 
-            d_without, d_with = 0, 0
+            d_without, d_with = -1, -1
             for a_index in associates[p_index]:
                 # with
                 if y_pred[a_index] == Y_removed[a_index]:
@@ -184,7 +184,7 @@ class reductionKnnAlgorithm(KNN):
                     d_without += 1
 
             # eq
-            if d_without >= d_with:
+            if (d_without > -1) and (d_with > -1) and (d_without >= d_with):
                 print('[INFO] Instance  removed: {}'.format(p_index))
                 index_removed.append(p_index)
                 for a_index in associates[p_index]:
