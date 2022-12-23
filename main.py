@@ -55,7 +55,7 @@ def main():
                                                      }
                                        }
             best_hyp = datasets_config_best_hyp[config['dataset']]
-            for reduction_alg in ['RNN']: #['RENN']
+            for reduction_alg in ["None",'RENN','RNN','DROP3']:
                 print('[INFO] Using reduction: {}'.format(reduction_alg))
                 best_hyp['reduction'] = reduction_alg
                 kfold_reduction(config, best_hyp)
