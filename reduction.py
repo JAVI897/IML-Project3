@@ -65,35 +65,54 @@ class reductionKnnAlgorithm(KNN):
         if self.W is None:
             self.compute_weights()
 
-    def rnn(self, X, Y): # RNN USING k = 1 (1-NN)
-        self.X = X
-        self.Y = Y
+    def cnn(self, X, Y):
+        cnn = [0]
+        loop = True
+        while loop:
+            for i in range(1, X.shape[0]):
+                xi, yi = X[i, :], Y[i]
+                cnnX = X[cnn, :]
+                cnnY = Y[cnn]
 
-        n_elements = X.shape[0]
+                self.X, self.Y = cnnX, cnnY
+                dM = self.computeDistanceMatrix(np.array([xi]))
+                knn_indexes = np.argsort(dM)
+                labels_of_neighbours = [Y[indexes].astype(np.int) for indexes in knn_indexes]
+                y_pred = self.vote(labels_of_neighbours, np.unique(Y).shape[0])
+                if yi != y_pred and (i not in cnn):
+                    cnn.append(i)
+                else:
+                    loop = False
+        return cnn
 
-        # initializing the reduced dataset
-        X_red = X[0:1, :]  # select the first row of the array X
-        Y_red = Y[0:1]  # select the first element of the array y
+    def rnn(self, X, Y):
 
-        for i in range(1, n_elements):  # for each of the elements
-            # find the nearest neighbour of example X[i] in the reduced dataset
-            dist = np.linalg.norm(X[i] - X_red, axis=1)
-            nearest_neighbour = np.argmin(dist)
+        #guardar k
+        n_neighbors = self.k
 
-            # if X[i] is not misclassified by the reduced dataset
-            if Y[i] == Y_red[nearest_neighbour]:
-                # adding X[i] to the reduced dataset
-                X_red = np.concatenate((X_red, X[i:i + 1, :]))
-                Y_red = np.concatenate((Y_red, Y[i:i + 1]))
-            else:
-                # removing the nearest neighbour from the reduced dataset
-                X_red = np.delete(X_red, nearest_neighbour, axis=0)
-                Y_red = np.delete(Y_red, nearest_neighbour)
-                # adding X[i] to the reduced dataset
-                X_red = np.concatenate((X_red, X[i:i + 1, :]))
-                Y_red = np.concatenate((Y_red, Y[i:i + 1]))
+        #fit 1-cnn
+        self.k = 1
+        cnn_indexes = self.cnn(X,Y)
 
-        return X_red, Y_red
+        #por cada individuo
+        for i in cnn_indexes:
+            rnn_indexes = cnn_indexes.remove(i)
+            #fit
+            self.X, self.Y =  X[rnn_indexes , :][0], Y[rnn_indexes][0]
+            self.compute_weights()
+
+            #predict
+            dM = self.computeDistanceMatrix(X)
+            knn_indexes = [np.argsort(dM[i, :])[1:self.k + 1] for i in range(X.shape[0])]
+            labels_of_neighbours = [self.Y[indexes].astype(np.int) for indexes in knn_indexes]
+            N_c = np.unique(self.Y).shape[0]
+            y_pred = self.vote(labels_of_neighbours, N_c)
+
+            if sum(y_pred == Y) == len(Y):
+                cnn_indexes = rnn_indexes
+
+        self.k = n_neighbors
+        return X[cnn_indexes, :], Y[cnn_indexes]
 
 
     def renn(self, X, Y):
