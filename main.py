@@ -7,7 +7,7 @@ from visualize import visualize_results, visualize_stat_test_matrix, plot_times,
 parser = argparse.ArgumentParser()
 
 ### run--> python main.py --dataset vote
-parser.add_argument("--dataset", type=str, default='adult', choices=['adult', 'hyp', 'pen-based'])
+parser.add_argument("--dataset", type=str, default='pen-based', choices=['adult', 'hyp', 'pen-based'])
 parser.add_argument("--run_experiments", type=str, default='yes', choices=['yes', 'no'])
 parser.add_argument("--reduction", type=str, default='no', choices=['yes', 'no'])
 parser.add_argument("--visualize_results", type=str, default='yes', choices=['yes', 'no'])

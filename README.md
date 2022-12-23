@@ -39,7 +39,7 @@ python main.py --dataset <dataset>
                --run_experiments <run_experiments>
                --reduction <reduction>
                --visualize_results <visualize_results>
-               --gpu <gpu>
+               --pytorch <pytorch>
 ```
 Specifying the parameters  according to the following table:
 
@@ -58,11 +58,17 @@ For each experiment, the code will save the distances matrices for each fold and
 The following execution would run each reduction algorithm with the best hyperparameters found which are defined in the script and it will return the results in the console.
 
 ```python
-python main.py --dataset hyp --run_experiments yes --reduction yes --visualize_results yes --gpu no
+python main.py --dataset hyp --run_experiments yes --reduction yes --visualize_results yes --pytorch no
 ```
 
 This other execution would run different experiments for a combination of hyperparameters defined in the code. Distances will be computed using scipy as the parameter *gpu* is set to 'no'.
 
 ```python
-python main.py --dataset hyp --run_experiments yes --reduction no --visualize_results yes --gpu no
+python main.py --dataset hyp --run_experiments yes --reduction no --visualize_results yes --pytorch no
+```
+
+The following execution would generate the corresponding plots for the hyp dataset.
+
+```python
+python main.py --dataset hyp --run_experiments no --reduction no --visualize_results yes --pytorch no
 ```
